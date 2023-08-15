@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nmedia">НМедиа</string>
+    <string name="post_avatar">Аватар поста</string>
+    <string name="post_like">Количество лайков</string>
+</resources>

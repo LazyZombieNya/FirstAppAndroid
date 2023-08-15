@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">FirstApp</string>
+    <string name="app_name" translatable="false">FirstApp</string>
+    <string name="nmedia">NMedia!</string>
+    <string name="post_avatar">"Post avatar"</string>
+    <string name="post_like">"Likes"</string>
+
 </resources>
