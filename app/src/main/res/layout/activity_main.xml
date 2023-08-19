@@ -9,14 +9,14 @@
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_marginBottom="@dimen/common_pading"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_marginBottom="@dimen/common_pading"
         android:contentDescription="@string/post_avatar"
+        android:src="@drawable/post_avatar_drawable"
         app:layout_constraintBottom_toBottomOf="@id/barrierTop"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@sample/posts_avatars" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/author"
@@ -74,15 +74,17 @@
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="content" />
+
     <ImageButton
         android:id="@+id/like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/post_like"
-        android:background="@android:color/transparent"
         android:layout_margin="@dimen/common_pading"
-        app:layout_constraintTop_toTopOf="@id/barrier_icon"
-        tools:srcCompat="@drawable/ic_baseline_favorite_border_24" />
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/post_like"
+        android:src="@drawable/ic_baseline_favorite_border_24"
+        app:layout_constraintTop_toTopOf="@id/barrier_icon" />
+
     <TextView
         android:id="@+id/countLike"
         android:layout_width="wrap_content"
@@ -90,19 +92,21 @@
         android:layout_marginHorizontal="@dimen/common_pading"
         android:ellipsize="end"
         android:singleLine="true"
-        app:layout_constraintTop_toTopOf="@id/like"
         app:layout_constraintStart_toEndOf="@id/like"
+        app:layout_constraintTop_toTopOf="@id/like"
         tools:text="10" />
+
     <ImageButton
         android:id="@+id/share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/post_like"
-        android:background="@android:color/transparent"
         android:layout_margin="@dimen/common_pading"
-        app:layout_constraintTop_toTopOf="@id/barrier_icon"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/post_like"
+        android:src="@drawable/ic_baseline_share_24"
         app:layout_constraintStart_toEndOf="@id/countLike"
-        tools:srcCompat="@drawable/ic_baseline_share_24" />
+        app:layout_constraintTop_toTopOf="@id/barrier_icon" />
+
     <TextView
         android:id="@+id/countShare"
         android:layout_width="wrap_content"
@@ -110,19 +114,21 @@
         android:layout_marginHorizontal="@dimen/common_pading"
         android:ellipsize="end"
         android:singleLine="true"
-        app:layout_constraintTop_toTopOf="@id/share"
         app:layout_constraintStart_toEndOf="@id/share"
+        app:layout_constraintTop_toTopOf="@id/share"
         tools:text="5" />
+
     <ImageButton
         android:id="@+id/view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/post_like"
-        android:background="@android:color/transparent"
         android:layout_margin="@dimen/common_pading"
-        app:layout_constraintTop_toTopOf="@id/barrier_icon"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/post_like"
+        android:src="@drawable/ic_baseline_eye_24"
         app:layout_constraintEnd_toStartOf="@id/countView"
-        tools:srcCompat="@drawable/ic_baseline_eye_24" />
+        app:layout_constraintTop_toTopOf="@id/barrier_icon" />
+
     <TextView
         android:id="@+id/countView"
         android:layout_width="wrap_content"
@@ -130,8 +136,8 @@
         android:layout_marginTop="@dimen/common_pading"
         android:ellipsize="end"
         android:singleLine="true"
-        app:layout_constraintTop_toTopOf="@id/barrier_icon"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/barrier_icon"
         tools:text="5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
