@@ -26,7 +26,7 @@ class PostRepositoryInMemoryImpl :PostRepository{
         data.value = post
     }
     override fun share() {
-        post.shares++
+        post = post.copy(shares = post.shares+1)
         data.value = post
     }
 }
