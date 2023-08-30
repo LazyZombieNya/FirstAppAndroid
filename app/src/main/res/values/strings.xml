@@ -3,5 +3,10 @@
     <string name="nmedia">NMedia!</string>
     <string name="post_avatar">"Post avatar"</string>
     <string name="post_like">"Likes"</string>
+    <string name="menu_remove" >Delete</string>
+    <string name="menu_edit" >Edit</string>
+    <string name="post_text" >Post text</string>
+    <string name="error_empty_content" >The input field must not be empty</string>
+    <string name="editMesage">Edit Message</string>
 
 </resources>

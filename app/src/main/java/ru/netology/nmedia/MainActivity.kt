@@ -2,10 +2,15 @@ package ru.netology.nmedia
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
+import ru.netology.nmedia.adapter.OnInteractionListener
+import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.ActivityMainBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.util.AndroidUtils
+import ru.netology.nmedia.util.AndroidUtils.focusAndShowKeyboard
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -14,39 +19,64 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val viewModel by viewModels<PostViewModel>()
-        viewModel.data.observe(this){post ->
-            with(binding) {
-                author.text = post.author
-                published.text = post.published
-                content.text = post.content
-                countLike.text = shortNumber(post.likes)
-                countShare.text = shortNumber(post.shares)
-                countView.text = shortNumber(post.views)
-                like?.setImageResource(if (post.likedByMe)R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24)
+        val viewModel: PostViewModel by viewModels()
+        val adapter = PostAdapter(object: OnInteractionListener{
+            override fun like(post: Post) {
+                viewModel.likeById(post.id)
+            }
+            override fun share(post: Post) {
+                viewModel.shareById(post.id)
+            }
+
+            override fun remove(post: Post) {
+                viewModel.removeById(post.id)
+            }
+
+            override fun edit(post: Post) {
+                viewModel.edit(post)
+            }
+
+        })
+        binding.list.adapter = adapter
+        viewModel.data.observe(this) { posts ->
+            val newPost = posts.size>adapter.currentList.size
+            adapter.submitList(posts)
+            if (newPost) {
+                binding.list.smoothScrollToPosition(0)
             }
         }
-            binding.like?.setOnClickListener {
-                viewModel.like()
-            }
-            binding.share?.setOnClickListener {
-                viewModel.share()
-            }
+        binding.closeEdit.setOnClickListener{
+            binding.groupEdit.visibility = View.GONE // перестаёт занимать место на экране
+            binding.groupEdit.visibility = View.INVISIBLE // невидима, но занимает место на экране
+            binding.editContent.setText("")
+            binding.editContent.clearFocus()
+            AndroidUtils.hideKeyboard(it)
+        }
 
-    }
+        viewModel.edited.observe(this){
+            if (it.id!=0L){
+                binding.editContent.setText(it.content)
+                binding.editContent.focusAndShowKeyboard()
+                binding.editMessage.text=it.content
+                binding.groupEdit.visibility = View.VISIBLE
+            }
+        }
 
-    private fun shortNumber(number: Int):String {
-        return when (number){
-            in 0..999->number.toString()
-            in 1000..1099->"1K"
-            in 1100..9999->(number/1000).toString()+"."+((number%1000)/100).toString()+"K"
-            in 10000..999999->(number/1000).toString()+"K"
-            in 1000000..1099999->(number/1000000).toString()+"M"
-            in 1100000..9999999->(number/1000000).toString()+"."+((number%1000000)/100000).toString()+"M"
-            else->"Many"
+        binding.btnSave.setOnClickListener{
+            val text =binding.editContent.text.toString()
+            if (text.isEmpty()) {
+                Toast.makeText(this, R.string.error_empty_content, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            viewModel.changeContentAndSave(text)
+            binding.editContent.setText("")
+            binding.editContent.clearFocus()
+            AndroidUtils.hideKeyboard(it)
+            binding.groupEdit.visibility = View.GONE // перестаёт занимать место на экране
+            binding.groupEdit.visibility = View.INVISIBLE // невидима, но занимает место на экране
         }
     }
-
-
 }
+
+
 
