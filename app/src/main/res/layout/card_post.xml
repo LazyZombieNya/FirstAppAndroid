@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -42,12 +41,13 @@
         app:layout_constraintTop_toBottomOf="@id/author"
         tools:text="@sample/posts.json/data/published" />
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/menu"
+        style="@style/Widget.AppTheme.NormalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_more_vertical_24dp"
+        app:icon="@drawable/ic_more_vertical_24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -76,48 +76,31 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="editContent" />
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/like"
+        style="@style/Widget.AppTheme.LikeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/common_pading"
-        android:background="@android:color/transparent"
+        android:checkable="true"
         android:contentDescription="@string/post_like"
-        android:src="@drawable/ic_baseline_favorite_border_24"
+        android:insetTop="0dp"
+        android:paddingTop="0dp"
+        app:icon="@drawable/ic_like_selector"
         app:layout_constraintTop_toTopOf="@id/barrier_icon" />
 
-    <TextView
-        android:id="@+id/countLike"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/common_pading"
-        android:ellipsize="end"
-        android:singleLine="true"
-        app:layout_constraintStart_toEndOf="@id/like"
-        app:layout_constraintTop_toTopOf="@id/like"
-        tools:text="10" />
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/share"
+        style="@style/Widget.AppTheme.NormalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/common_pading"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/post_like"
-        android:src="@drawable/ic_baseline_share_24"
-        app:layout_constraintStart_toEndOf="@id/countLike"
+        app:icon="@drawable/ic_baseline_share_24"
+        android:contentDescription="@string/post_share"
+        app:layout_constraintStart_toEndOf="@id/like"
         app:layout_constraintTop_toTopOf="@id/barrier_icon" />
 
-    <TextView
-        android:id="@+id/countShare"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/common_pading"
-        android:ellipsize="end"
-        android:singleLine="true"
-        app:layout_constraintStart_toEndOf="@id/share"
-        app:layout_constraintTop_toTopOf="@id/share"
-        tools:text="5" />
 
     <ImageButton
         android:id="@+id/view"
