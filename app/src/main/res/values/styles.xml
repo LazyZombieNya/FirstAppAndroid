@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Widget.AppTheme.LikeButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="iconTint">@color/like_selector</item>
+        <item name="android:textColor">?attr/colorControlNormal</item>
+        <item name="android:minWidth">0dp</item>
+    </style>
+
+    <style name="Widget.AppTheme.NormalButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="android:textColor">?attr/colorControlNormal</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="iconTint">?attr/colorControlNormal</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+
+    </style>
+</resources>

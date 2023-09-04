@@ -8,4 +8,5 @@
     <string name="post_text" >Текст поста</string>
     <string name="error_empty_content">Поле ввода не должно быть пустым</string>
     <string name="editMesage">Редактирование</string>
+    <string name="post_share" >Поделиться</string>
 </resources>

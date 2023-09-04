@@ -8,5 +8,6 @@
     <string name="post_text" >Post text</string>
     <string name="error_empty_content" >The input field must not be empty</string>
     <string name="editMesage">Edit Message</string>
+    <string name="post_share" >Share post</string>
 
 </resources>
