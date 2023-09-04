@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
             binding.groupEdit.visibility = View.INVISIBLE // невидима, но занимает место на экране
             binding.editContent.setText("")
             binding.editContent.clearFocus()
+            viewModel.cancelEdit()
             AndroidUtils.hideKeyboard(it)
         }
 
