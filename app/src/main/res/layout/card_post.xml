@@ -101,25 +101,16 @@
         app:layout_constraintStart_toEndOf="@id/like"
         app:layout_constraintTop_toTopOf="@id/barrier_icon" />
 
-
-    <ImageButton
-        android:id="@+id/view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/common_pading"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/post_like"
-        android:src="@drawable/ic_baseline_eye_24"
-        app:layout_constraintEnd_toStartOf="@id/countView"
-        app:layout_constraintTop_toTopOf="@id/barrier_icon" />
-
-    <TextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/countView"
+        style="@style/Widget.AppTheme.NormalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/common_pading"
+        android:enabled="false"
         android:ellipsize="end"
         android:singleLine="true"
+        app:icon="@drawable/ic_baseline_eye_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/barrier_icon"
         tools:text="5" />
