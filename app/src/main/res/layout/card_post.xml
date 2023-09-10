@@ -59,7 +59,7 @@
         app:constraint_referenced_ids="avatar,published,menu" />
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/editContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/common_pading"
@@ -74,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="content" />
+        app:constraint_referenced_ids="editContent" />
 
     <ImageButton
         android:id="@+id/like"
