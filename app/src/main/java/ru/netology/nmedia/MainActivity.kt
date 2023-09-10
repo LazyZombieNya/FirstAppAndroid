@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
             AndroidUtils.hideKeyboard(it)
         }
 
+
         viewModel.edited.observe(this){
             if (it.id!=0L){
                 binding.editContent.setText(it.content)
@@ -78,6 +79,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
-
-
