@@ -55,16 +55,6 @@
         app:layout_constraintEnd_toEndOf="@id/closeEdit"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <ImageView
-        android:id="@+id/editBackground"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-
-        android:background="@android:color/white"
-
-        app:layout_constraintBottom_toBottomOf="@id/list"
-        app:layout_constraintEnd_toEndOf="@id/closeEdit"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/editImage"
