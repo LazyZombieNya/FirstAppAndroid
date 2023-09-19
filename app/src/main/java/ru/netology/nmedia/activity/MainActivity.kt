@@ -1,6 +1,7 @@
 package ru.netology.nmedia.activity
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -46,6 +47,15 @@ class MainActivity : AppCompatActivity() {
                 startActivity(shareIntent)
                 viewModel.shareById(post.id)
             }
+            override fun video(post: Post) {
+                val intent = Intent().apply {
+                    action = Intent.ACTION_VIEW
+                    data = Uri.parse("https://www.youtube.com/watch?v=WhWc3b3KhnY")
+                }
+                val playVideo = Intent.createChooser(intent, "play Video")
+                startActivity(playVideo)
+
+            }
 
             override fun remove(post: Post) {
 
@@ -67,6 +77,7 @@ class MainActivity : AppCompatActivity() {
                 binding.list.smoothScrollToPosition(0)
             }
         }
+
 //        binding.closeEdit.setOnClickListener{
 //            binding.groupEdit.visibility = View.GONE // перестаёт занимать место на экране
 //            binding.groupEdit.visibility = View.INVISIBLE // невидима, но занимает место на экране
