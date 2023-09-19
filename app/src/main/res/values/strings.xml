@@ -9,5 +9,7 @@
     <string name="error_empty_content" >The input field must not be empty</string>
     <string name="editMesage">Edit Message</string>
     <string name="post_share" >Share post</string>
+    <string name="description_post_save" >Save post</string>
+    <string name="add_post" >Add new post</string>
 
 </resources>

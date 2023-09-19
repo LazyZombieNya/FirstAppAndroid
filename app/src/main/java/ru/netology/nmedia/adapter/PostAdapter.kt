@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.viewmodel.PostViewModel
+
 interface OnInteractionListener{
     fun like(post: Post)
     fun remove(post: Post)
     fun edit(post: Post)
-    fun share(post: Post) {
+    fun onShare(post: Post) {
 
     }
 }
@@ -56,7 +56,7 @@ class PostViewHolder(
                 onInteractionListener.like(post)
             }
             share?.setOnClickListener {
-                onInteractionListener.share(post)
+                onInteractionListener.onShare(post)
             }
 
             menu.setOnClickListener {
