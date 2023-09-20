@@ -1,6 +1,7 @@
 package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
@@ -44,6 +45,11 @@ class PostViewHolder(
             published.text = post.published
             editContent.text = post.content
             countView.text = shortNumber(post.views)
+            if (post.content=="https://www.youtube.com/watch?v=WhWc3b3KhnY") {
+                videoContent.visibility = View.VISIBLE
+            } else {
+                videoContent.visibility = View.GONE
+            }
 
             like.isChecked = post.likedByMe
             like.text = shortNumber(post.likes)
