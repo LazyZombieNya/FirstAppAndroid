@@ -17,7 +17,8 @@ class PostRepositoryInMemoryImpl : PostRepository {
             likedByMe = false,
             likes = 33,
             shares = 25,
-            views = 5
+            views = 5,
+            video = ""
         ),
         Post(
 
@@ -28,7 +29,8 @@ class PostRepositoryInMemoryImpl : PostRepository {
             likedByMe = false,
             likes = 999,
             shares = 999999,
-            views = 4
+            views = 4,
+            video = ""
         ),
         Post(
             id = nextId++,
@@ -38,17 +40,19 @@ class PostRepositoryInMemoryImpl : PostRepository {
             likedByMe = false,
             likes = 999,
             shares = 99999,
-            views = 3
+            views = 3,
+            video = ""
         ),
         Post(
             id = nextId++,
             author = "Нетология. Университет интернет-профессий будущего",
-            content = "Привет, это новая Нетология! Когда-то Нетология начиналась с интенсивов по онлайн-маркетингу. Затем появились курсы по дизайну, разработке, аналитике и управлению. Мы растём сами и помогаем расти студентам: от новичков до уверенных профессионалов. Но самое важное остаётся с нами: мы верим, что в каждом уже есть сила, которая заставляет хотеть больше, целиться выше, бежать быстрее. Наша миссия — помочь встать на путь роста и начать цепочку перемен → http://netolo.gy/fyb",
+            content = "Весна",
             published = "1 мая в 18:36",
             likedByMe = false,
             likes = 9999,
             shares = 9999,
-            views = 2
+            views = 2,
+            video = "https://www.youtube.com/watch?v=WhWc3b3KhnY"
         ),
         Post(
             id = nextId++,
@@ -58,7 +62,8 @@ class PostRepositoryInMemoryImpl : PostRepository {
             likedByMe = false,
             likes = 2,
             shares = 9,
-            views = 1
+            views = 1,
+            video = ""
         ),
 
     ).reversed()

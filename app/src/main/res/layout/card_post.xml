@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/common_pading"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <ImageView
         android:id="@+id/avatar"
@@ -56,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="avatar,published,menu" />
+        app:constraint_referenced_ids="" />
 
     <TextView
         android:id="@+id/editContent"
@@ -65,16 +65,29 @@
         android:layout_marginTop="@dimen/common_pading"
         android:autoLink="web"
         android:paddingBottom="@dimen/common_pading"
+
         app:layout_constraintTop_toTopOf="@id/barrierTop"
+        app:layout_constraintBottom_toTopOf="@id/videoContent"
         tools:layout_editor_absoluteX="16dp"
         tools:text="@sample/posts.json/data/content" />
+
+    <ImageView
+        android:id="@+id/videoContent"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_play_circle_filled_24"
+        app:layout_constraintTop_toBottomOf="@id/editContent"
+
+        />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="editContent" />
+        app:constraint_referenced_ids="editContent,videoContent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/like"
@@ -96,8 +109,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/common_pading"
-        app:icon="@drawable/ic_baseline_share_24"
         android:contentDescription="@string/post_share"
+        app:icon="@drawable/ic_baseline_share_24"
         app:layout_constraintStart_toEndOf="@id/like"
         app:layout_constraintTop_toTopOf="@id/barrier_icon" />
 
@@ -107,8 +120,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/common_pading"
-        android:enabled="false"
         android:ellipsize="end"
+        android:enabled="false"
         android:singleLine="true"
         app:icon="@drawable/ic_baseline_eye_24"
         app:layout_constraintEnd_toEndOf="parent"

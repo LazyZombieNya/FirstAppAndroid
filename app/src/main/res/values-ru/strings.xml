@@ -9,4 +9,6 @@
     <string name="error_empty_content">Поле ввода не должно быть пустым</string>
     <string name="editMesage">Редактирование</string>
     <string name="post_share" >Поделиться</string>
+    <string name="description_post_save">Сохранить</string>
+    <string name="add_post" >Добавить новый пост</string>
 </resources>
