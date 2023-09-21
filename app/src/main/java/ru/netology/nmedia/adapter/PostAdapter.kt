@@ -26,6 +26,7 @@ class PostAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return PostViewHolder(binding,onInteractionListener)
+
     }
 
 
@@ -43,6 +44,7 @@ class PostViewHolder(
         binding.apply {
             author.text = post.author
             published.text = post.published
+
             editContent.text = post.content
             countView.text = shortNumber(post.views)
             if (post.video.isNotEmpty()) {
