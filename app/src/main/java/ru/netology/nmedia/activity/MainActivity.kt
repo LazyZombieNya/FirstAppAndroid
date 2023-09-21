@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             override fun video(post: Post) {
                 val intent = Intent().apply {
                     action = Intent.ACTION_VIEW
-                    data = Uri.parse("https://www.youtube.com/watch?v=WhWc3b3KhnY")
+                    data = Uri.parse(post.video)
                 }
                 val playVideo = Intent.createChooser(intent, "play Video")
                 startActivity(playVideo)

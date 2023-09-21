@@ -17,7 +17,8 @@ class PostRepositoryInMemoryImpl : PostRepository {
             likedByMe = false,
             likes = 33,
             shares = 25,
-            views = 5
+            views = 5,
+            video = ""
         ),
         Post(
             id = nextId++,
@@ -27,7 +28,8 @@ class PostRepositoryInMemoryImpl : PostRepository {
             likedByMe = false,
             likes = 999,
             shares = 999999,
-            views = 4
+            views = 4,
+            video = ""
         ),
         Post(
             id = nextId++,
@@ -37,17 +39,19 @@ class PostRepositoryInMemoryImpl : PostRepository {
             likedByMe = false,
             likes = 999,
             shares = 99999,
-            views = 3
+            views = 3,
+            video = ""
         ),
         Post(
             id = nextId++,
             author = "Нетология. Университет интернет-профессий будущего",
-            content = "https://www.youtube.com/watch?v=WhWc3b3KhnY",
+            content = "Весна",
             published = "1 мая в 18:36",
             likedByMe = false,
             likes = 9999,
             shares = 9999,
-            views = 2
+            views = 2,
+            video = "https://www.youtube.com/watch?v=WhWc3b3KhnY"
         ),
         Post(
             id = nextId++,
@@ -57,7 +61,8 @@ class PostRepositoryInMemoryImpl : PostRepository {
             likedByMe = false,
             likes = 2,
             shares = 9,
-            views = 1
+            views = 1,
+            video = ""
         ),
 
     ).reversed()

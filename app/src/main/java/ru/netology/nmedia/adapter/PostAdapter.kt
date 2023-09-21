@@ -45,7 +45,7 @@ class PostViewHolder(
             published.text = post.published
             editContent.text = post.content
             countView.text = shortNumber(post.views)
-            if (post.content=="https://www.youtube.com/watch?v=WhWc3b3KhnY") {
+            if (post.video.isNotEmpty()) {
                 videoContent.visibility = View.VISIBLE
             } else {
                 videoContent.visibility = View.GONE
