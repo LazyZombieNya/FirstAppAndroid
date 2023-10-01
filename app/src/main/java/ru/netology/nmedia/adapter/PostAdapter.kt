@@ -17,6 +17,7 @@ interface OnInteractionListener{
     fun edit(post: Post)
     fun onShare(post: Post)
     fun video(post: Post)
+    fun clickPost(post: Post)
 }
 
 class PostAdapter(
@@ -59,6 +60,9 @@ class PostViewHolder(
 
             videoContent?.setOnClickListener {
                 onInteractionListener.video(post)
+            }
+            root?.setOnClickListener {
+                onInteractionListener.clickPost(post)
             }
 
             like?.setOnClickListener {
