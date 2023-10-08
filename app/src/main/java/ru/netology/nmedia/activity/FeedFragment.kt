@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostAdapter
@@ -60,11 +61,12 @@ class FeedFragment : Fragment(){
             }
 
             override fun clickPost(post: Post) {
-                findNavController().navigate(R.id.action_feedFragment_to_detailsFragmentPost,Bundle().also { it.text = post.content })
+                findNavController().navigate(R.id.action_feedFragment_to_detailsFragmentPost,Bundle().also {  it.text = post.content })
             }
             override fun remove(post: Post) {
 
                 viewModel.removeById(post.id)
+
             }
 
             override fun edit(post: Post) {
