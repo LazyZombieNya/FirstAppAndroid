@@ -5,22 +5,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
-import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.databinding.FragmentPostBinding
-import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.LongArg
-import ru.netology.nmedia.util.StringArg
+import ru.netology.nmedia.util.NiceNumberDisplay
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class DetailsFragmentPost : Fragment() {
     companion object {
         var Bundle.id: Long? by LongArg
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,21 +37,57 @@ class DetailsFragmentPost : Fragment() {
                 return@observe
 
             }
-            binding.author.setText(post.author)
-            binding.published.setText(post.published)
+            binding.author.text = post.author
+            binding.published.text = post.published
             binding.editContent.text = post.content
-            if (post.video.isNotEmpty())
-                binding.videoContent.visibility = View.VISIBLE else binding.videoContent.visibility = View.INVISIBLE
-            binding.like.text=post.likes.toString()
-            binding.share.text=post.shares.toString()
-            binding.countView.text=post.views.toString()
+            binding.like.isChecked = post.likedByMe
+
+            if (post.video.isNotEmpty()) {
+                binding.videoContent.visibility = View.VISIBLE
+            } else {
+                binding.videoContent.visibility = View.GONE
+            }
+            binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
+            binding.share.text = NiceNumberDisplay.shortNumber(post.shares)
+            binding.countView.text = NiceNumberDisplay.shortNumber(post.views)
+
+            binding.edit.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_detailsFragmentPost_to_newPostFragment,
+                    Bundle().also { it.text = post.content })
+                viewModel.edit(post)
+            }
+
+            binding.like.setOnClickListener {
+                if (id != null) {
+                    viewModel.likeById(id)
+                }
+            }
+            binding.share.setOnClickListener {
+                if (id != null) {
+                    viewModel.shareById(id)
+                }
+            }
+            binding.delete.setOnClickListener {
+                if (id != null) {
+                    viewModel.removeById(id)
+                    findNavController().navigate(
+                        R.id.action_detailsFragmentPost_to_feedFragment)
+                }
+            }
+
+
+            binding.forward.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_detailsFragmentPost_to_feedFragment)
+            }
+        }
+        //для обработки события системной кнопки «Назад»
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
+            findNavController().navigate(
+                R.id.action_detailsFragmentPost_to_feedFragment)
         }
 
-        binding.edit.setOnClickListener{
-
-            //findNavController().navigate(R.id.action_feedFragment_to_newPostFragment,Bundle().also { it.id=id)
-
-        }
 
         return binding.root
     }

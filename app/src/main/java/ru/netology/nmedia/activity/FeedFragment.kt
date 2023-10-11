@@ -61,7 +61,7 @@ class FeedFragment : Fragment(){
             }
 
             override fun clickPost(post: Post) {
-                findNavController().navigate(R.id.action_feedFragment_to_detailsFragmentPost,Bundle().also {  it.text = post.content })
+                findNavController().navigate(R.id.action_feedFragment_to_detailsFragmentPost,Bundle().also {  it.id = post.id })
             }
             override fun remove(post: Post) {
 
