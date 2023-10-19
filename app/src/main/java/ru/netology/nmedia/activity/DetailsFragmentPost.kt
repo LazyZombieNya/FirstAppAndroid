@@ -1,6 +1,7 @@
 package ru.netology.nmedia.activity
 
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -96,6 +97,7 @@ class DetailsFragmentPost : Fragment() {
         val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
             findNavController().navigate(
                 R.id.action_detailsFragmentPost_to_feedFragment)
+
         }
 
 
