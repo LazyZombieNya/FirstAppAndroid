@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.util.NiceNumberDisplay
 
 interface OnInteractionListener{
     fun like(post: Post)
@@ -17,6 +18,7 @@ interface OnInteractionListener{
     fun edit(post: Post)
     fun onShare(post: Post)
     fun video(post: Post)
+    fun clickPost(post: Post)
 }
 
 class PostAdapter(
@@ -46,7 +48,7 @@ class PostViewHolder(
             published.text = post.published
 
             editContent.text = post.content
-            countView.text = shortNumber(post.views)
+            countView.text = NiceNumberDisplay.shortNumber(post.views)
             if (post.video.isNotEmpty()) {
                 videoContent.visibility = View.VISIBLE
             } else {
@@ -54,11 +56,14 @@ class PostViewHolder(
             }
 
             like.isChecked = post.likedByMe
-            like.text = shortNumber(post.likes)
-            share.text = shortNumber(post.shares)
+            like.text = NiceNumberDisplay.shortNumber(post.likes)
+            share.text = NiceNumberDisplay.shortNumber(post.shares)
 
             videoContent?.setOnClickListener {
                 onInteractionListener.video(post)
+            }
+            root?.setOnClickListener {
+                onInteractionListener.clickPost(post)
             }
 
             like?.setOnClickListener {
@@ -88,17 +93,7 @@ class PostViewHolder(
             }
         }
     }
-    private fun shortNumber(number: Int): String {
-        return when (number) {
-            in 0..999 -> number.toString()
-            in 1000..1099 -> "1K"
-            in 1100..9999 -> (number / 1000).toString() + "." + ((number % 1000) / 100).toString() + "K"
-            in 10000..999999 -> (number / 1000).toString() + "K"
-            in 1000000..1099999 -> (number / 1000000).toString() + "M"
-            in 1100000..9999999 -> (number / 1000000).toString() + "." + ((number % 1000000) / 100000).toString() + "M"
-            else -> "Many"
-        }
-    }
+
 }
 class PostDiffCallback : DiffUtil.ItemCallback<Post>(){
     override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {

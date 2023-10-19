@@ -8,7 +8,7 @@ import androidx.activity.result.contract.ActivityResultContract
 class NewPostResultContract : ActivityResultContract<String, String?>() {
 
     override fun createIntent(context: Context, input: String): Intent =
-        Intent(context, NewPostActivity::class.java).putExtra(Intent.EXTRA_TITLE, input)
+        Intent(context, NewPostFragment::class.java).putExtra(Intent.EXTRA_TITLE, input)
 
     override fun parseResult(resultCode: Int, intent: Intent?): String? =
         if (resultCode == Activity.RESULT_OK) {
