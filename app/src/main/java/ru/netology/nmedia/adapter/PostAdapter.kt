@@ -49,7 +49,7 @@ class PostViewHolder(
 
             editContent.text = post.content
             countView.text = NiceNumberDisplay.shortNumber(post.views)
-            if (post.video.isNotEmpty()) {
+            if (post.video.toString()!="0") {// С NULL не работает
                 videoContent.visibility = View.VISIBLE
             } else {
                 videoContent.visibility = View.GONE
@@ -62,9 +62,15 @@ class PostViewHolder(
             videoContent?.setOnClickListener {
                 onInteractionListener.video(post)
             }
-            root?.setOnClickListener {
+            //чтобы ссылки не мешали когда кликаешь на editContent
+            val rootClickListener = View.OnClickListener {
                 onInteractionListener.clickPost(post)
             }
+            root.setOnClickListener(rootClickListener)
+            editContent.setOnClickListener(rootClickListener)
+//            root?.setOnClickListener {
+//                onInteractionListener.clickPost(post)
+//            }
 
             like?.setOnClickListener {
                 onInteractionListener.like(post)

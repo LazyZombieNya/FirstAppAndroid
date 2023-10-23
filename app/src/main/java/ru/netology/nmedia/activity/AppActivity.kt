@@ -39,11 +39,6 @@ class AppActivity : AppCompatActivity() {
                 R.id.action_feedFragment_to_newPostFragment,
                 Bundle().also { it.text = text }
             )
-
-//            findNavController(R.id.container).navigate(R.id.action_feedFragment_to_newPostFragment,
-//                bundleOf("content" to text)
-//            )
-
         }
     }
 }

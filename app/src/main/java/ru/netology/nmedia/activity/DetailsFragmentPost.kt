@@ -1,6 +1,8 @@
 package ru.netology.nmedia.activity
 
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -42,7 +44,7 @@ class DetailsFragmentPost : Fragment() {
             binding.editContent.text = post.content
             binding.like.isChecked = post.likedByMe
 
-            if (post.video.isNotEmpty()) {
+            if (post.video.toString()!="0"){
                 binding.videoContent.visibility = View.VISIBLE
             } else {
                 binding.videoContent.visibility = View.GONE
@@ -65,6 +67,15 @@ class DetailsFragmentPost : Fragment() {
             }
             binding.share.setOnClickListener {
                 if (id != null) {
+                    val intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, post.content)
+                        type = "text/plain"
+                    }
+
+                    val shareIntent =
+                        Intent.createChooser(intent, getString(R.string.post_share))
+                    startActivity(shareIntent)
                     viewModel.shareById(id)
                 }
             }
@@ -86,6 +97,7 @@ class DetailsFragmentPost : Fragment() {
         val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
             findNavController().navigate(
                 R.id.action_detailsFragmentPost_to_feedFragment)
+
         }
 
 
