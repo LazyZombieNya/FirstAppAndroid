@@ -44,7 +44,7 @@ class DetailsFragmentPost : Fragment() {
             binding.editContent.text = post.content
             binding.like.isChecked = post.likedByMe
 
-            if (post.video.toString()!="0"){
+            if (!post.video.isNullOrBlank()){
                 binding.videoContent.visibility = View.VISIBLE
             } else {
                 binding.videoContent.visibility = View.GONE
