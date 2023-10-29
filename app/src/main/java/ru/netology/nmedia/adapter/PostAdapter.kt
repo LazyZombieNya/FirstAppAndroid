@@ -49,7 +49,7 @@ class PostViewHolder(
 
             editContent.text = post.content
             countView.text = NiceNumberDisplay.shortNumber(post.views)
-            if (post.video.toString()!="0") {// С NULL не работает
+            if (!post.video.isNullOrBlank()) {
                 videoContent.visibility = View.VISIBLE
             } else {
                 videoContent.visibility = View.GONE
