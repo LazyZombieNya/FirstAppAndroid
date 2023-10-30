@@ -42,20 +42,15 @@ class FCMService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
 
         message.data[action]?.let {
-            //if (Action.values().find {  Action.valueOf(it)} )
-            try {
-                when (Action.valueOf(it)) {
-                    Action.LIKE -> {
-                        handleLike(gson.fromJson(message.data[content], Like::class.java))
-                    }
-
-                    Action.NEW_POST -> {
-                        handleNewPost(gson.fromJson(message.data[content], NewPost::class.java))
-                    }
+            if (!Action.values().map { action -> action.name }.contains(it)) return
+            when (Action.valueOf(it)) {
+                Action.LIKE -> {
+                    handleLike(gson.fromJson(message.data[content], Like::class.java))
                 }
-            }catch (e: IllegalArgumentException) {
-                    println("Error: Undefined action")
+                Action.NEW_POST -> {
+                    handleNewPost(gson.fromJson(message.data[content], NewPost::class.java))
                 }
+            }
         }
         println(Gson().toJson(message))
     }
@@ -65,8 +60,8 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun handleLike(content: Like) {
-        val intent = Intent(this,AppActivity::class.java)
-        val pi = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_IMMUTABLE)
+        val intent = Intent(this, AppActivity::class.java)
+        val pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(
@@ -83,16 +78,20 @@ class FCMService : FirebaseMessagingService() {
 
         notify(notification)
     }
+
     private fun handleNewPost(content: NewPost) {
-        val intent = Intent(this,AppActivity::class.java)
-        val pi = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_IMMUTABLE)
+        val intent = Intent(this, AppActivity::class.java)
+        val pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(
-                getString(R.string.notification_user_add_new_post,content.userName))
+                getString(R.string.notification_user_add_new_post, content.userName)
+            )
             .setContentText(content.content)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(content.content))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(content.content)
+            )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pi)
             .setAutoCancel(true)
@@ -125,6 +124,7 @@ data class Like(
     val postId: Long,
     val postAuthor: String,
 )
+
 data class NewPost(
     val userId: Long,
     val userName: String,
