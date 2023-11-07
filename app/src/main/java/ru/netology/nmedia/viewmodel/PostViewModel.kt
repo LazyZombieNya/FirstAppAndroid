@@ -88,18 +88,18 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun likeById(id: Long) {
-//        thread { repository.likeById(id) }
         thread {
             val old = _data.value?.posts.orEmpty()
+            println("Like post: "+data.value?.posts)
             _data.postValue(
                 _data.value?.copy(posts = _data.value?.posts.orEmpty().map {if(it.id != id)  it
                 else it.copy(likedByMe = !it.likedByMe,likes = if(it.likedByMe) it.likes -1 else it.likes +1)})
             )
-            println("Like post: "+data.value?.posts)
+            println("Like post2: "+data.value?.posts)
             try {
-               // repository.likeById(id)
+                repository.likeById(id)
             } catch (e: IOException) {
-               // _data.postValue(_data.value?.copy(posts = old))
+                _data.postValue(_data.value?.copy(posts = old))
             }
         }
     }
@@ -122,7 +122,18 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     fun shareById(id: Long) {
-        thread { repository.shareById(id) }
+        thread {
+            val old = _data.value?.posts.orEmpty()
+            _data.postValue(
+                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {if(it.id != id)  it else it.copy(shares=it.shares+1)})
+            )
+            println("Like post2: "+data.value?.posts)
+            try {
+                repository.shareById(id)
+            } catch (e: IOException) {
+                _data.postValue(_data.value?.copy(posts = old))
+            }
+        }
     }
 
 
