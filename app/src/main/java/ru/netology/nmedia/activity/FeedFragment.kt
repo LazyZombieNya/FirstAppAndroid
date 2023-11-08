@@ -2,18 +2,15 @@ package ru.netology.nmedia.activity
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
@@ -24,6 +21,7 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment(){
+    private var mSwipeRefreshLayout: SwipeRefreshLayout? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,7 +33,13 @@ class FeedFragment : Fragment(){
         val viewModel: PostViewModel by activityViewModels()
 
 
+        refreshApp()
+
+
+
         val adapter = PostAdapter(object: OnInteractionListener{
+            override fun onRefresh(){}
+
             override fun like(post: Post) {
                 viewModel.likeById(post.id)
             }
@@ -93,6 +97,13 @@ class FeedFragment : Fragment(){
 
 
         return binding.root
+    }
+    private fun refreshApp() {
+//        val swipeToRefresh = findViewById<View>(R.id.swipeToRefresh)
+//        swipeToRefresh.setOnRefreshListener {
+//            swipeToRefresh.isRefreshing = false
+//        }
+
     }
 
 
