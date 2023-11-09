@@ -36,10 +36,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val edited = MutableLiveData(empty)
 
 
-
     init {
         loadPosts()
     }
+
     fun loadPosts() {
         thread {
             // Начинаем загрузку
@@ -90,14 +90,19 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun likeById(id: Long) {
         thread {
             val old = _data.value?.posts.orEmpty()
-            println("Like post: "+data.value?.posts)
-            _data.postValue(
-                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {if(it.id != id)  it
-                else it.copy(likedByMe = !it.likedByMe,likes = if(it.likedByMe) it.likes -1 else it.likes +1)})
-            )
-            println("Like post2: "+data.value?.posts)
             try {
-                repository.likeById(id)
+                val post = if (old.last().likedByMe) {
+                    repository.unLikeById(id)
+                } else {
+                    repository.likeById(id)
+                }
+
+                _data.postValue(
+                    _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
+                        if (it.id != id) it
+                        else post
+                    })
+                )
             } catch (e: IOException) {
                 _data.postValue(_data.value?.copy(posts = old))
             }
@@ -113,7 +118,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                     .filter { it.id != id }
                 )
             )
-            println("Delete post: "+data.value)
             try {
                 repository.removeById(id)
             } catch (e: IOException) {
@@ -121,15 +125,18 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
     fun shareById(id: Long) {
         thread {
             val old = _data.value?.posts.orEmpty()
-            _data.postValue(
-                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {if(it.id != id)  it else it.copy(shares=it.shares+1)})
-            )
-            println("Like post2: "+data.value?.posts)
             try {
-                repository.shareById(id)
+                val post = repository.shareById(id)
+                _data.postValue(
+                    _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
+                        if (it.id != id) it
+                        else it.copy(shares=it.shares+1)
+                    })
+                )
             } catch (e: IOException) {
                 _data.postValue(_data.value?.copy(posts = old))
             }

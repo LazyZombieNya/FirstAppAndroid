@@ -33,7 +33,10 @@ class FeedFragment : Fragment(){
         val viewModel: PostViewModel by activityViewModels()
 
 
-        refreshApp()
+        binding.swiperefresh.setOnRefreshListener {
+            binding.swiperefresh.isRefreshing = false
+            viewModel.loadPosts()
+        }
 
 
 
@@ -94,19 +97,8 @@ class FeedFragment : Fragment(){
         binding.FAB.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
         }
-
-
         return binding.root
     }
-    private fun refreshApp() {
-//        val swipeToRefresh = findViewById<View>(R.id.swipeToRefresh)
-//        swipeToRefresh.setOnRefreshListener {
-//            swipeToRefresh.isRefreshing = false
-//        }
-
-    }
-
-
 
 }
 
