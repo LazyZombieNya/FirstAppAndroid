@@ -63,6 +63,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         edited.value = empty
+
     }
 
     fun changeContent(content: String) {
@@ -71,6 +72,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         edited.value = edited.value?.copy(content = text)
+
     }
 
 
@@ -89,9 +91,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun likeById(id: Long) {
         thread {
-            val old = _data.value?.posts.orEmpty()
+            val old = _data.value?.posts.orEmpty().asReversed()
             try {
-                val post = if (old.last().likedByMe) {
+                println("Like"+id+": "+old[id.toInt()-1])
+                val post = if (old[id.toInt()-1].likedByMe ) {
                     repository.unLikeById(id)
                 } else {
                     repository.likeById(id)
