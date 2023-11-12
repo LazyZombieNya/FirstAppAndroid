@@ -92,9 +92,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun likeById(id: Long) {
         thread {
             val old = _data.value?.posts.orEmpty().asReversed()
+            val oldPost = old.find { it.id == id } ?: return@thread
             try {
-                println("Like"+id+": "+old[id.toInt()-1])
-                val post = if (old[id.toInt()-1].likedByMe ) {
+
+                val post = if (oldPost.likedByMe ) {
                     repository.unLikeById(id)
                 } else {
                     repository.likeById(id)
