@@ -22,6 +22,7 @@ class NewPostFragment : Fragment() {
     companion object {
         var Bundle.text: String? by StringArg
     }
+
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,9 +54,14 @@ class NewPostFragment : Fragment() {
         binding.ok.setOnClickListener {
             if (!binding.edit.text.isNullOrBlank()) {
                 val content = binding.edit.text.toString()
-                viewModel.changeContentAndSave(content)
+                viewModel.changeContent(content)
+                viewModel.save()
                 activity?.deleteSharedPreferences("MyPref")//Удаляет сохраннее данные из черновика
             }
+            findNavController().navigateUp()
+        }
+        viewModel.postCreated.observe(viewLifecycleOwner) {
+            viewModel.loadPosts()
             findNavController().navigateUp()
         }
 
@@ -70,6 +76,9 @@ class NewPostFragment : Fragment() {
             }
             findNavController().navigate(
                 R.id.action_newPostFragment_to_feedFragment)
+        }
+        viewModel.postCreated.observe(viewLifecycleOwner){
+            findNavController().navigateUp()
         }
 
 

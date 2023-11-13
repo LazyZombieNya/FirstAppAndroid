@@ -34,7 +34,7 @@ class DetailsFragmentPost : Fragment() {
         val id: Long? = arguments?.id
 
         viewModel.data.observe(viewLifecycleOwner) { posts ->
-            val post = posts.find { it.id == id } ?: run {
+            val post = posts.posts.find { it.id == id } ?: run {
                 //findNavController().navigateUp()
                 return@observe
 

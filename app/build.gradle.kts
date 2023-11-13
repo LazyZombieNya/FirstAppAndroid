@@ -22,12 +22,16 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isMinifyEnabled =  false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            manifestPlaceholders["usesCleartextTraffic"] = "false"
         }
+        debug {
+            isMinifyEnabled =  false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
+        }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -59,6 +63,8 @@ dependencies {
     implementation (platform("com.google.firebase:firebase-bom:32.4.1"))
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation ("com.google.android.gms:play-services-ads-base:22.4.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
