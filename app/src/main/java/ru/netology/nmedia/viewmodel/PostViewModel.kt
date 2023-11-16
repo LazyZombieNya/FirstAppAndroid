@@ -9,8 +9,6 @@ import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent
-import java.io.IOException
-import kotlin.concurrent.thread
 import kotlin.collections.List as List
 
 private val empty = Post(
@@ -88,9 +86,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             repository.unLikeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
                 override fun onSuccess(result: Post) {
                     _data.postValue(
-                        _data.value?.copy(
-                            posts = listOf(
-                                _data.value?.posts.orEmpty().find { it.id == id } ?: return)))
+                        _data.value?.copy(posts = _data.value?.posts.orEmpty().map { if (it.id != id) it else result }))
                 }
 
                 override fun onError(e: Exception) {
@@ -101,9 +97,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             repository.likeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
                 override fun onSuccess(result: Post) {
                     _data.postValue(
-                        _data.value?.copy(
-                            posts = listOf(
-                                _data.value?.posts.orEmpty().find { it.id == id } ?: return)))
+                        _data.value?.copy(posts = _data.value?.posts.orEmpty().map { if (it.id != id) it else result }))
                 }
 
                 override fun onError(e: Exception) {
@@ -171,7 +165,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun shareById(id: Long) {
-//        thread {
+
 //            val old = _data.value?.posts.orEmpty()
 //            try {
 //                val post = repository.shareByIdAsync(id)
