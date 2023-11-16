@@ -132,7 +132,6 @@ class PostRepositoryImpl: PostRepository {
     }
 
     override fun saveAsync(post: Post,callback: PostRepository.RepositoryCallback<Post>) {
-        println("Like^ " + gson.toJson(post).toRequestBody(jsonType))
         val request: Request = Request.Builder()
             .post(gson.toJson(post).toRequestBody(jsonType))
             .url("${BASE_URL}posts")
@@ -161,8 +160,20 @@ class PostRepositoryImpl: PostRepository {
             .url("${BASE_URL}posts/$id")
             .build()
 
-        client.newCall(request)
-            .execute()
-            .close()
+        return client.newCall(request)
+            .enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    val body = response.body?.string() ?: throw RuntimeException("body is null")
+                    try {
+                        callback.onSuccess(gson.fromJson(body, Post::class.java))
+                    } catch (e: Exception) {
+                        callback.onError(e)
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError(e)
+                }
+            })
     }
 }
