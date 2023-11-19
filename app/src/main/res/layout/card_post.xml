@@ -87,7 +87,7 @@
         android:layout_height="200dp"
         android:clickable="true"
         android:focusable="true"
-        android:visibility="gone"
+        android:scaleType="centerCrop"
         app:layout_constraintTop_toBottomOf="@id/videoContent"
         />
 

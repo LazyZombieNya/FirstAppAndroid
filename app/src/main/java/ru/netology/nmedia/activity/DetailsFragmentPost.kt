@@ -61,20 +61,19 @@ class DetailsFragmentPost : Fragment() {
             } else {
                 binding.videoContent.visibility = View.GONE
             }
-//            if (!post.attachment.isNullOrBlank()){
-//                binding.attachmentImage.visibility = View.VISIBLE
-//                val attachmentName = post.attachment
-//                val url = "http://10.0.2.2:9999/images/${attachmentName}"
-//                Glide.with(binding.attachmentImage)
-//                    .load(url)
-//                    .circleCrop()
-//                    .placeholder(R.drawable.ic_loading_100dp)
-//                    .error(R.drawable.ic_error_100dp)
-//                    .timeout(10_000)
-//                    .into(binding.attachmentImage)
-//            } else {
-//                binding.attachmentImage.visibility = View.GONE
-//            }
+           if (post.attachment!=null){
+                binding.attachmentImage.visibility = View.VISIBLE
+                val attachmentUrl = post.attachment.url
+                val url = "http://10.0.2.2:9999/images/${attachmentUrl}"
+                Glide.with(binding.attachmentImage)
+                    .load(url)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .into(binding.attachmentImage)
+            } else {
+                binding.attachmentImage.visibility = View.GONE
+            }
 
             binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
             binding.share.text = NiceNumberDisplay.shortNumber(post.shares)

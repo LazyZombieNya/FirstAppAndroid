@@ -119,7 +119,6 @@
         android:layout_height="200dp"
         android:clickable="true"
         android:focusable="true"
-        android:visibility="gone"
         android:padding="@dimen/common_spacing"
         android:src="@drawable/ic_play_circle_filled_24"
         app:layout_constraintTop_toBottomOf="@id/editContent"
@@ -131,6 +130,7 @@
         android:layout_height="200dp"
         android:clickable="true"
         android:focusable="true"
+        android:scaleType="centerCrop"
         app:layout_constraintTop_toBottomOf="@id/videoContent"
         />
 

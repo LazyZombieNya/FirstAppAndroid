@@ -14,7 +14,7 @@ import kotlin.collections.List as List
 private val empty = Post(
     id = 0,
     author = "",
-    authorAvatar="",
+    authorAvatar ="",
     content = "",
     published = "",
     likedByMe = false,
@@ -22,7 +22,7 @@ private val empty = Post(
     shares = 0,
     views = 0,
     video = "",
-    //attachment= "null"
+    attachment = null
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
