@@ -4,14 +4,12 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent
-import java.io.IOException
-import kotlin.concurrent.thread
+import kotlin.collections.List as List
 
 private val empty = Post(
     id = 0,
@@ -41,30 +39,35 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadPosts() {
-        thread {
-            // Начинаем загрузку
-            _data.postValue(FeedModel(loading = true))
-            try {
-                // Данные успешно получены
-                val posts = repository.getAll()
-                FeedModel(posts = posts, empty = posts.isEmpty())
-            } catch (e: IOException) {
-                // Получена ошибка
-                FeedModel(error = true)
-            }.also(_data::postValue)
-        }
+        // Начинаем загрузку
+        _data.postValue(FeedModel(loading = true))
+        repository.getAllAsync(object : PostRepository.RepositoryCallback<List<Post>> {
+            override fun onSuccess(posts: List<Post>) {
+                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+            }
+
+            override fun onError(e: Exception) {
+                _data.postValue(FeedModel(error = true))
+            }
+        })
     }
 
     fun save() {
         edited.value?.let {
-            thread {
-                repository.save(it)
-                _postCreated.postValue(Unit)
-            }
+            repository.saveAsync(it, object : PostRepository.RepositoryCallback<Post> {
+                override fun onSuccess(result: Post) {
+                    _postCreated.postValue(Unit)
+                }
+
+                override fun onError(e: Exception) {
+                    _data.postValue(FeedModel(error = true))
+                }
+            })
+
         }
         edited.value = empty
-
     }
+
 
     fun changeContent(content: String) {
         val text = content.trim()
@@ -76,75 +79,106 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-//        edited.value?.let {
-//            val text = content.trim()
-//            if (it.content != text) {
-//                thread {
-//                    repository.save(it.copy(content = text))
-//                    _postCreated.postValue(Unit)
-//                }
-//            }
-//        }
-//        edited.value = empty
-//    }
-
-
     fun likeById(id: Long) {
-        thread {
-            val old = _data.value?.posts.orEmpty().asReversed()
-            val oldPost = old.find { it.id == id } ?: return@thread
-            try {
-
-                val post = if (oldPost.likedByMe ) {
-                    repository.unLikeById(id)
-                } else {
-                    repository.likeById(id)
+        val old = _data.value?.posts.orEmpty().asReversed()
+        val oldPost = old.find { it.id == id } ?: return
+        val post = if (oldPost.likedByMe) {
+            repository.unLikeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
+                override fun onSuccess(result: Post) {
+                    _data.postValue(
+                        _data.value?.copy(posts = _data.value?.posts.orEmpty().map { if (it.id != id) it else result }))
                 }
 
-                _data.postValue(
-                    _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
-                        if (it.id != id) it
-                        else post
-                    })
-                )
-            } catch (e: IOException) {
-                _data.postValue(_data.value?.copy(posts = old))
-            }
+                override fun onError(e: Exception) {
+                    _data.postValue(_data.value?.copy(posts = old))
+                }
+            })
+        } else {
+            repository.likeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
+                override fun onSuccess(result: Post) {
+                    _data.postValue(
+                        _data.value?.copy(posts = _data.value?.posts.orEmpty().map { if (it.id != id) it else result }))
+                }
+
+                override fun onError(e: Exception) {
+                    _data.postValue(_data.value?.copy(posts = old))
+                }
+            })
         }
     }
 
+
+//    fun likeById(id: Long) {
+//
+//            val old = _data.value?.posts.orEmpty().asReversed()
+//            val oldPost = old.find { it.id == id } ?: return
+//                val post = if (oldPost.likedByMe) {
+//                    repository.unLikeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
+//                        override fun onSuccess(result: Post) {
+//                            _data.postValue(
+//                                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
+//                                    if (it.id != id) it
+//                                    else  pos
+//                                })
+//                            )
+//                        }
+//                        override fun onError(e: Exception) {
+//                            _data.postValue(FeedModel(error = true))
+//                        }
+//                    })
+//                } else {
+//                    repository.likeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
+//                        override fun onSuccess(result: Post) {
+//                            _data.postValue(
+//                                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
+//                                    if (it.id != id) it
+//                                    else post
+//                                })
+//                            )
+//                        }
+//                        override fun onError(e: Exception) {
+//                            _data.postValue(FeedModel(error = true))
+//                        }
+//                    })
+//
+
+//            } catch (e: IOException) {
+//                _data.postValue(_data.value?.copy(posts = old))
+//            }
+//        }
+//    }
+
     fun removeById(id: Long) {
-        thread {
-            // Оптимистичная модель
-            val old = _data.value?.posts.orEmpty()
-            _data.postValue(
-                _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                    .filter { it.id != id }
+        val old = _data.value?.posts.orEmpty()
+        repository.removeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
+            override fun onSuccess(result: Post) {
+                _data.postValue(
+                    _data.value?.copy(posts = _data.value?.posts.orEmpty()
+                        .filter { it.id != id }
+                    )
                 )
-            )
-            try {
-                repository.removeById(id)
-            } catch (e: IOException) {
+            }
+            override fun onError(e: Exception) {
                 _data.postValue(_data.value?.copy(posts = old))
             }
-        }
+        })
     }
 
     fun shareById(id: Long) {
-        thread {
-            val old = _data.value?.posts.orEmpty()
-            try {
-                val post = repository.shareById(id)
-                _data.postValue(
-                    _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
-                        if (it.id != id) it
-                        else it.copy(shares=it.shares+1)
-                    })
-                )
-            } catch (e: IOException) {
-                _data.postValue(_data.value?.copy(posts = old))
-            }
-        }
+
+//            val old = _data.value?.posts.orEmpty()
+//            try {
+//                val post = repository.shareByIdAsync(id)
+//                _data.postValue(
+//                    _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
+//                        if (it.id != id) it
+//                        else it.copy(shares = it.shares + 1)
+//                    })
+//                )
+//            } catch (e: IOException) {
+//                _data.postValue(_data.value?.copy(posts = old))
+//            }
+//        }
     }
 
 
