@@ -7,6 +7,7 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
@@ -45,6 +46,16 @@ class PostViewHolder(
 ):RecyclerView.ViewHolder(binding.root){
     fun bind(post: Post){
         binding.apply {
+            val avatarName = post.authorAvatar
+            val url = "http://10.0.2.2:9999/avatars/${avatarName}"
+            Glide.with(binding.avatar)
+                .load(url)
+                .circleCrop()
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .into(binding.avatar)
+
             author.text = post.author
             published.text = post.published
 
@@ -55,6 +66,20 @@ class PostViewHolder(
             } else {
                 videoContent.visibility = View.GONE
             }
+//            if (!post.attachment.isNullOrBlank()){
+//                binding.attachmentImage.visibility = View.VISIBLE
+//                val attachmentName = post.attachment
+//                val url = "http://10.0.2.2:9999/images/${attachmentName}"
+//                Glide.with(binding.attachmentImage)
+//                    .load(url)
+//                    .circleCrop()
+//                    .placeholder(R.drawable.ic_loading_100dp)
+//                    .error(R.drawable.ic_error_100dp)
+//                    .timeout(10_000)
+//                    .into(binding.attachmentImage)
+//            } else {
+//                binding.attachmentImage.visibility = View.GONE
+//            }
 
             like.isChecked = post.likedByMe
             like.text = NiceNumberDisplay.shortNumber(post.likes)

@@ -14,6 +14,8 @@ data class PostEntity (
     val id: Long,
     @ColumnInfo(name = "author", defaultValue = "Me")
     val author: String ,
+    @ColumnInfo(name = "authorAvatar", defaultValue = "netology.jpg")
+    val authorAvatar:String,
     @ColumnInfo(name = "published", defaultValue = "now")
     val published: String,
     val content: String,
@@ -26,13 +28,15 @@ data class PostEntity (
     @ColumnInfo(name = "views", defaultValue = "0")
     val views:Int,
     @ColumnInfo(name = "video", defaultValue = "")
-    val video:String
+    val video:String,
+//    @ColumnInfo(name = "attachment", defaultValue = "")
+//    val attachment:String
 ){
-    fun toDto() = Post(id, author,published, content , likedByMe, likes,shares,views,video)
+    fun toDto() = Post(id, author,authorAvatar,published, content , likedByMe, likes,shares,views,video/*,attachment*/)
 
     companion object {
         fun fromDto(dto: Post) =
-            PostEntity(dto.id, dto.author, dto.published, dto.content, dto.likedByMe, dto.likes,dto.shares,dto.views,dto.video)
+            PostEntity(dto.id, dto.author,dto.authorAvatar, dto.published, dto.content, dto.likedByMe, dto.likes,dto.shares,dto.views,dto.video/*,dto.attachment*/)
 
     }
 }
