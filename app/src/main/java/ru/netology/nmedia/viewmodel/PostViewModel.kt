@@ -45,7 +45,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         _data.postValue(FeedModel(loading = true))
         repository.getAllAsync(object : PostRepository.RepositoryCallback<List<Post>> {
             override fun onSuccess(posts: List<Post>) {
-                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+                _data.value=(FeedModel(posts = posts, empty = posts.isEmpty()))
             }
 
             override fun onError(e: Exception) {
@@ -56,13 +56,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun save() {
         edited.value?.let {
-            repository.saveAsync(it, object : PostRepository.RepositoryCallback<Post> {
-                override fun onSuccess(result: Post) {
-                    _postCreated.postValue(Unit)
+            repository.saveAsync(it, object : PostRepository.SaveCallback{
+                override fun onSuccess(value: Unit) {
+                    _postCreated.value=(Unit)
                 }
 
                 override fun onError(e: Exception) {
-                    _data.postValue(FeedModel(error = true))
+                    _data.value=(FeedModel(error = true))
                 }
             })
 
@@ -151,8 +151,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun removeById(id: Long) {
         val old = _data.value?.posts.orEmpty()
-        repository.removeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
-            override fun onSuccess(result: Post) {
+        repository.removeByIdAsync(id, object : PostRepository.RemoveCallback {
+            override fun onSuccess(result: Unit) {
                 _data.postValue(
                     _data.value?.copy(posts = _data.value?.posts.orEmpty()
                         .filter { it.id != id }

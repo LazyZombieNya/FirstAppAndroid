@@ -19,17 +19,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures.viewBinding = true
+    buildFeatures.buildConfig = true
 
     buildTypes {
         release {
             isMinifyEnabled =  false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             manifestPlaceholders["usesCleartextTraffic"] = "false"
+            buildConfigField("String","BASE_URL", "\"https://netomedia.ru\"")
         }
         debug {
             isMinifyEnabled =  false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             manifestPlaceholders["usesCleartextTraffic"] = "true"
+            buildConfigField("String","BASE_URL", "\"http://10.0.2.2:9999\"")
         }
 
     }
@@ -44,6 +47,9 @@ android {
 }
 dependencies {
     val room_version = "2.6.0"
+    val retrofit_version = "2.9.0"
+    val retrofitgson_version = "2.9.0"
+    val okhttplogging_version = "4.12.0"
 
 
 
@@ -66,6 +72,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("com.github.bumptech.glide:glide:4.14.2")
+    implementation ("com.squareup.retrofit2:retrofit:$retrofit_version")
+    implementation ("com.squareup.retrofit2:converter-gson:$retrofitgson_version")
+    implementation ("com.squareup.okhttp3:logging-interceptor:$okhttplogging_version")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
