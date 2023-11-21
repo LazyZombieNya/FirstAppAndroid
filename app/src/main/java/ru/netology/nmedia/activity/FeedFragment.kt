@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.sarveshathawale.kotlintoasts.shortToast
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
@@ -36,6 +37,7 @@ class FeedFragment : Fragment(){
         binding.swiperefresh.setOnRefreshListener {
             binding.swiperefresh.isRefreshing = false
             viewModel.loadPosts()
+            context?.shortToast { "Update" }
         }
 
 

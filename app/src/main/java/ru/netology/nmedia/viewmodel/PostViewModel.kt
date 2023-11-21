@@ -4,10 +4,14 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.sarveshathawale.kotlintoasts.shortToast
+import okhttp3.internal.notify
+import ru.netology.nmedia.activity.FeedFragment
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
+import ru.netology.nmedia.util.AndroidUtils.toast
 import ru.netology.nmedia.util.SingleLiveEvent
 import kotlin.collections.List as List
 
@@ -85,7 +89,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         val old = _data.value?.posts.orEmpty().asReversed()
         val oldPost = old.find { it.id == id } ?: return
         val post = if (oldPost.likedByMe) {
-            repository.unLikeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
+            repository.unLikeByIdAsync(id,  object : PostRepository.RepositoryCallback<Post> {
                 override fun onSuccess(result: Post) {
                     _data.postValue(
                         _data.value?.copy(posts = _data.value?.posts.orEmpty().map { if (it.id != id) it else result }))
@@ -108,46 +112,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
-//    fun likeById(id: Long) {
-//
-//            val old = _data.value?.posts.orEmpty().asReversed()
-//            val oldPost = old.find { it.id == id } ?: return
-//                val post = if (oldPost.likedByMe) {
-//                    repository.unLikeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
-//                        override fun onSuccess(result: Post) {
-//                            _data.postValue(
-//                                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
-//                                    if (it.id != id) it
-//                                    else  pos
-//                                })
-//                            )
-//                        }
-//                        override fun onError(e: Exception) {
-//                            _data.postValue(FeedModel(error = true))
-//                        }
-//                    })
-//                } else {
-//                    repository.likeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
-//                        override fun onSuccess(result: Post) {
-//                            _data.postValue(
-//                                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
-//                                    if (it.id != id) it
-//                                    else post
-//                                })
-//                            )
-//                        }
-//                        override fun onError(e: Exception) {
-//                            _data.postValue(FeedModel(error = true))
-//                        }
-//                    })
-//
-
-//            } catch (e: IOException) {
-//                _data.postValue(_data.value?.copy(posts = old))
-//            }
-//        }
-//    }
 
     fun removeById(id: Long) {
         val old = _data.value?.posts.orEmpty()

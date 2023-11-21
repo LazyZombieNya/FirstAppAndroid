@@ -1,16 +1,18 @@
 package ru.netology.nmedia.repository
 
+import android.content.Context
+import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import ru.netology.nmedia.api.PostsApi
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.util.AndroidUtils.toast
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -43,14 +45,16 @@ class PostRepositoryImpl : PostRepository {
         PostsApi.retrofitService.getAll().enqueue(object : Callback<List<Post>> {
             override fun onResponse(call: Call<List<Post>>, response: Response<List<Post>>) {
                 if (!response.isSuccessful) {
+                    //Toast.makeText(this@PostRepositoryImpl,response.code(),Toast.LENGTH_SHORT)
                     callback.onError(RuntimeException(response.message()))
-                    //return
+                    return
                 }
                 callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
             }
 
             override fun onFailure(call: Call<List<Post>>, t: Throwable) {
                 callback.onError(Exception(t))
+
             }
         })
     }
@@ -63,7 +67,7 @@ class PostRepositoryImpl : PostRepository {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
-                    //return
+                    return
                 }
                 callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
             }
@@ -83,13 +87,14 @@ class PostRepositoryImpl : PostRepository {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
-                    //return
+                    return
                 }
                 callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
             }
 
             override fun onFailure(call: Call<Post>, t: Throwable) {
                 callback.onError(Exception(t))
+
             }
         })
 
@@ -120,7 +125,7 @@ class PostRepositoryImpl : PostRepository {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
-                    //return
+                    return
                 }
                 callback.onSuccess(Unit)
             }
@@ -137,7 +142,7 @@ class PostRepositoryImpl : PostRepository {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (!response.isSuccessful) {
                     callback.onError(RuntimeException(response.message()))
-                    //return
+                    return
                 }
                 callback.onSuccess(response.body() ?: throw RuntimeException("body is null"))
             }

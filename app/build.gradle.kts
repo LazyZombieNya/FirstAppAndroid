@@ -75,6 +75,7 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:$retrofit_version")
     implementation ("com.squareup.retrofit2:converter-gson:$retrofitgson_version")
     implementation ("com.squareup.okhttp3:logging-interceptor:$okhttplogging_version")
+    implementation ("com.sarveshathawale:kotlintoasts:1.0.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
