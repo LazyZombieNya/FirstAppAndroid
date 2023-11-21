@@ -11,6 +11,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
 import ru.netology.nmedia.databinding.FragmentPostBinding
@@ -39,6 +40,17 @@ class DetailsFragmentPost : Fragment() {
                 return@observe
 
             }
+            val avatarName = post.authorAvatar
+            val url = "http://10.0.2.2:9999/avatars/${avatarName}"
+            Glide.with(binding.avatar)
+                .load(url)
+                .circleCrop()
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .into(binding.avatar)
+
+
             binding.author.text = post.author
             binding.published.text = post.published
             binding.editContent.text = post.content
@@ -49,6 +61,20 @@ class DetailsFragmentPost : Fragment() {
             } else {
                 binding.videoContent.visibility = View.GONE
             }
+           if (post.attachment!=null){
+                binding.attachmentImage.visibility = View.VISIBLE
+                val attachmentUrl = post.attachment.url
+                val url = "http://10.0.2.2:9999/images/${attachmentUrl}"
+                Glide.with(binding.attachmentImage)
+                    .load(url)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .into(binding.attachmentImage)
+            } else {
+                binding.attachmentImage.visibility = View.GONE
+            }
+
             binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
             binding.share.text = NiceNumberDisplay.shortNumber(post.shares)
             binding.countView.text = NiceNumberDisplay.shortNumber(post.views)

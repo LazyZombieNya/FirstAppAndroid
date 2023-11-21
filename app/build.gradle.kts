@@ -65,6 +65,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-ads-base:22.4.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("com.github.bumptech.glide:glide:4.14.2")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -14,13 +14,15 @@ import kotlin.collections.List as List
 private val empty = Post(
     id = 0,
     author = "",
+    authorAvatar ="",
     content = "",
     published = "",
     likedByMe = false,
     likes = 0,
     shares = 0,
     views = 0,
-    video = ""
+    video = "",
+    attachment = null
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -88,7 +90,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                     _data.postValue(
                         _data.value?.copy(posts = _data.value?.posts.orEmpty().map { if (it.id != id) it else result }))
                 }
-
                 override fun onError(e: Exception) {
                     _data.postValue(_data.value?.copy(posts = old))
                 }
