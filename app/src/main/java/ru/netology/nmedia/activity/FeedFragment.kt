@@ -6,12 +6,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.sarveshathawale.kotlintoasts.shortToast
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
@@ -19,10 +22,11 @@ import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.util.AndroidUtils.toast
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment(){
-    private var mSwipeRefreshLayout: SwipeRefreshLayout? = null
+    //private var mSwipeRefreshLayout: SwipeRefreshLayout? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,9 +41,12 @@ class FeedFragment : Fragment(){
         binding.swiperefresh.setOnRefreshListener {
             binding.swiperefresh.isRefreshing = false
             viewModel.loadPosts()
-            context?.shortToast { "Update" }
+            context?.toast("Update" )
         }
 
+        viewModel.toast.observe(viewLifecycleOwner, Observer {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        })
 
 
         val adapter = PostAdapter(object: OnInteractionListener{

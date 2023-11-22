@@ -1,17 +1,17 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
+import android.content.res.Resources
+import android.provider.Settings.Global.getString
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.sarveshathawale.kotlintoasts.shortToast
-import okhttp3.internal.notify
-import ru.netology.nmedia.activity.FeedFragment
+import ru.netology.nmedia.R
+
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
-import ru.netology.nmedia.util.AndroidUtils.toast
 import ru.netology.nmedia.util.SingleLiveEvent
 import kotlin.collections.List as List
 
@@ -40,6 +40,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val edited = MutableLiveData(empty)
 
 
+    val toast : LiveData<String>
+        get() = toastLiveData
+
+    private val toastLiveData = SingleLiveEvent<String>()
+
+    fun toastErrorMsg(msg: String) {
+        toastLiveData.value = msg
+    }
+
     init {
         loadPosts()
     }
@@ -54,6 +63,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onError(e: Exception) {
                 _data.postValue(FeedModel(error = true))
+                toastErrorMsg("Something went wrong. Try again later")//R.string.error_loading
             }
         })
     }
@@ -67,6 +77,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
                 override fun onError(e: Exception) {
                     _data.value=(FeedModel(error = true))
+                    toastErrorMsg("Error saving post")//R.string.error_save_post
                 }
             })
 
@@ -96,6 +107,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 override fun onError(e: Exception) {
                     _data.postValue(_data.value?.copy(posts = old))
+                    toastErrorMsg("Unlike error")//R.string.error_unlike
                 }
             })
         } else {
@@ -107,6 +119,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
                 override fun onError(e: Exception) {
                     _data.postValue(_data.value?.copy(posts = old))
+                    toastErrorMsg("Like  error")//R.string.error_like
                 }
             })
         }
@@ -125,6 +138,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
             override fun onError(e: Exception) {
                 _data.postValue(_data.value?.copy(posts = old))
+                toastErrorMsg("Error deleting post")//R.string.error_remove_post
             }
         })
     }

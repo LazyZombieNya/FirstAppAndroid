@@ -19,4 +19,8 @@
     <string name="retry_loading">Повторить</string>
     <string name="empty_posts">Постов нет.\nЕсли создадите новый пост, то он появится здесь</string>
     <string name="error_loading">Что-то пошло не так. Попробуйте позднее</string>
+    <string name="error_like">Ошибка установки лайка</string>
+    <string name="error_unlike">Ошибка удаления лайка</string>
+    <string name="error_save_post">Ошибка сохранения поста</string>
+    <string name="error_remove_post">Ошибка удаления поста</string>
 </resources>
