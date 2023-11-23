@@ -53,6 +53,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         loadPosts()
     }
 
+    enum class ErrorAction {
+        LOAD_POST_ERROR,
+        LIKE_ERROR,
+        UNLIKE_ERROR,
+        SAVE_ERROR,
+        REMOVE_ERROR,
+        SHARE_ERROR
+    }
     fun loadPosts() {
         // Начинаем загрузку
         _data.postValue(FeedModel(loading = true))
@@ -63,7 +71,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onError(e: Exception) {
                 _data.postValue(FeedModel(error = true))
-                toastErrorMsg("Something went wrong. Try again later")//R.string.error_loading
+                toastErrorMsg("LOAD_POST_ERROR")//R.string.error_loading))
             }
         })
     }
@@ -77,7 +85,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
                 override fun onError(e: Exception) {
                     _data.value=(FeedModel(error = true))
-                    toastErrorMsg("Error saving post")//R.string.error_save_post
+                    toastErrorMsg("SAVE_ERROR")//R.string.error_save_post
                 }
             })
 
@@ -107,7 +115,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 override fun onError(e: Exception) {
                     _data.postValue(_data.value?.copy(posts = old))
-                    toastErrorMsg("Unlike error")//R.string.error_unlike
+                    toastErrorMsg("UNLIKE_ERROR")//R.string.error_unlike
                 }
             })
         } else {
@@ -119,7 +127,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
                 override fun onError(e: Exception) {
                     _data.postValue(_data.value?.copy(posts = old))
-                    toastErrorMsg("Like  error")//R.string.error_like
+                    toastErrorMsg("LIKE_ERROR")//R.string.error_like
                 }
             })
         }
@@ -138,7 +146,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
             override fun onError(e: Exception) {
                 _data.postValue(_data.value?.copy(posts = old))
-                toastErrorMsg("Error deleting post")//R.string.error_remove_post
+                toastErrorMsg("REMOVE_ERROR")//R.string.error_remove_post
             }
         })
     }

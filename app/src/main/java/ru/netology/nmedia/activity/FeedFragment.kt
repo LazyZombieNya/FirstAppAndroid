@@ -15,6 +15,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.firebase.messaging.RemoteMessage
+import com.google.gson.Gson
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
@@ -22,6 +24,9 @@ import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.service.Action
+import ru.netology.nmedia.service.Like
+import ru.netology.nmedia.service.NewPost
 import ru.netology.nmedia.util.AndroidUtils.toast
 import ru.netology.nmedia.viewmodel.PostViewModel
 
@@ -36,17 +41,49 @@ class FeedFragment : Fragment(){
         val binding = FragmentFeedBinding.inflate(layoutInflater)
 
         val viewModel: PostViewModel by activityViewModels()
+        val actionMessage :String
 
 
         binding.swiperefresh.setOnRefreshListener {
             binding.swiperefresh.isRefreshing = false
             viewModel.loadPosts()
-            context?.toast("Update" )
+            //context?.toast("Update" )
         }
 
+//        viewModel.toast.observe(viewLifecycleOwner, Observer {
+//            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+//        })
+
         viewModel.toast.observe(viewLifecycleOwner, Observer {
-            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                when (PostViewModel.ErrorAction.valueOf(it)) {
+                    PostViewModel.ErrorAction.LOAD_POST_ERROR -> {
+                        Toast.makeText(context, getString(R.string.error_loading), Toast.LENGTH_LONG).show()
+
+                    }
+                    PostViewModel.ErrorAction.SAVE_ERROR -> {
+                        Toast.makeText(context, getString(R.string.error_save_post), Toast.LENGTH_LONG).show()
+
+                    }
+                    PostViewModel.ErrorAction.REMOVE_ERROR -> {
+                        Toast.makeText(context, getString(R.string.error_remove_post), Toast.LENGTH_LONG).show()
+
+                    }
+                    PostViewModel.ErrorAction.SHARE_ERROR -> {
+                        Toast.makeText(context, getString(R.string.error_unlike), Toast.LENGTH_LONG).show()
+
+                    }
+                    PostViewModel.ErrorAction.LIKE_ERROR -> {
+                        Toast.makeText(context, getString(R.string.error_like), Toast.LENGTH_LONG).show()
+
+                    }
+                    PostViewModel.ErrorAction.UNLIKE_ERROR -> {
+                        Toast.makeText(context, getString(R.string.error_unlike), Toast.LENGTH_LONG).show()
+
+                    }
+                }
         })
+
+
 
 
         val adapter = PostAdapter(object: OnInteractionListener{
