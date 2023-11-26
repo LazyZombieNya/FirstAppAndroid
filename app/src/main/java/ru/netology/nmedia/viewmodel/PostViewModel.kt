@@ -1,9 +1,13 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
+import android.content.res.Resources
+import android.provider.Settings.Global.getString
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import ru.netology.nmedia.R
+
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.PostRepository
@@ -36,33 +40,52 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val edited = MutableLiveData(empty)
 
 
+    val toast : LiveData<String>
+        get() = toastLiveData
+
+    private val toastLiveData = SingleLiveEvent<String>()
+
+    fun toastErrorMsg(msg: String) {
+        toastLiveData.value = msg
+    }
+
     init {
         loadPosts()
     }
 
+    enum class ErrorAction {
+        LOAD_POST_ERROR,
+        LIKE_ERROR,
+        UNLIKE_ERROR,
+        SAVE_ERROR,
+        REMOVE_ERROR,
+        SHARE_ERROR
+    }
     fun loadPosts() {
         // Начинаем загрузку
         _data.postValue(FeedModel(loading = true))
         repository.getAllAsync(object : PostRepository.RepositoryCallback<List<Post>> {
             override fun onSuccess(posts: List<Post>) {
-                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+                _data.value=(FeedModel(posts = posts, empty = posts.isEmpty()))
             }
 
             override fun onError(e: Exception) {
                 _data.postValue(FeedModel(error = true))
+                toastErrorMsg("LOAD_POST_ERROR")//R.string.error_loading))
             }
         })
     }
 
     fun save() {
         edited.value?.let {
-            repository.saveAsync(it, object : PostRepository.RepositoryCallback<Post> {
-                override fun onSuccess(result: Post) {
-                    _postCreated.postValue(Unit)
+            repository.saveAsync(it, object : PostRepository.SaveCallback{
+                override fun onSuccess(value: Unit) {
+                    _postCreated.value=(Unit)
                 }
 
                 override fun onError(e: Exception) {
-                    _data.postValue(FeedModel(error = true))
+                    _data.value=(FeedModel(error = true))
+                    toastErrorMsg("SAVE_ERROR")//R.string.error_save_post
                 }
             })
 
@@ -85,13 +108,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         val old = _data.value?.posts.orEmpty().asReversed()
         val oldPost = old.find { it.id == id } ?: return
         val post = if (oldPost.likedByMe) {
-            repository.unLikeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
+            repository.unLikeByIdAsync(id,  object : PostRepository.RepositoryCallback<Post> {
                 override fun onSuccess(result: Post) {
                     _data.postValue(
                         _data.value?.copy(posts = _data.value?.posts.orEmpty().map { if (it.id != id) it else result }))
                 }
                 override fun onError(e: Exception) {
                     _data.postValue(_data.value?.copy(posts = old))
+                    toastErrorMsg("UNLIKE_ERROR")//R.string.error_unlike
                 }
             })
         } else {
@@ -103,56 +127,17 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
                 override fun onError(e: Exception) {
                     _data.postValue(_data.value?.copy(posts = old))
+                    toastErrorMsg("LIKE_ERROR")//R.string.error_like
                 }
             })
         }
     }
 
 
-//    fun likeById(id: Long) {
-//
-//            val old = _data.value?.posts.orEmpty().asReversed()
-//            val oldPost = old.find { it.id == id } ?: return
-//                val post = if (oldPost.likedByMe) {
-//                    repository.unLikeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
-//                        override fun onSuccess(result: Post) {
-//                            _data.postValue(
-//                                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
-//                                    if (it.id != id) it
-//                                    else  pos
-//                                })
-//                            )
-//                        }
-//                        override fun onError(e: Exception) {
-//                            _data.postValue(FeedModel(error = true))
-//                        }
-//                    })
-//                } else {
-//                    repository.likeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
-//                        override fun onSuccess(result: Post) {
-//                            _data.postValue(
-//                                _data.value?.copy(posts = _data.value?.posts.orEmpty().map {
-//                                    if (it.id != id) it
-//                                    else post
-//                                })
-//                            )
-//                        }
-//                        override fun onError(e: Exception) {
-//                            _data.postValue(FeedModel(error = true))
-//                        }
-//                    })
-//
-
-//            } catch (e: IOException) {
-//                _data.postValue(_data.value?.copy(posts = old))
-//            }
-//        }
-//    }
-
     fun removeById(id: Long) {
         val old = _data.value?.posts.orEmpty()
-        repository.removeByIdAsync(id, object : PostRepository.RepositoryCallback<Post> {
-            override fun onSuccess(result: Post) {
+        repository.removeByIdAsync(id, object : PostRepository.RemoveCallback {
+            override fun onSuccess(result: Unit) {
                 _data.postValue(
                     _data.value?.copy(posts = _data.value?.posts.orEmpty()
                         .filter { it.id != id }
@@ -161,6 +146,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
             override fun onError(e: Exception) {
                 _data.postValue(_data.value?.copy(posts = old))
+                toastErrorMsg("REMOVE_ERROR")//R.string.error_remove_post
             }
         })
     }
