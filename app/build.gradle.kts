@@ -46,7 +46,7 @@ android {
     }
 }
 dependencies {
-    val room_version = "2.6.0"
+    val room_version = "2.6.1"
     val retrofit_version = "2.9.0"
     val retrofitgson_version = "2.9.0"
     val okhttplogging_version = "4.12.0"
@@ -76,6 +76,8 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:$retrofitgson_version")
     implementation ("com.squareup.okhttp3:logging-interceptor:$okhttplogging_version")
     implementation ("com.sarveshathawale:kotlintoasts:1.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
