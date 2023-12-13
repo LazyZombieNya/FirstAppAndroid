@@ -11,7 +11,7 @@ data class Post(
     val shares:Int,
     val views:Int,
     val video:String,
-    //val attachment: Attachment?
+    val attachment: Attachment?
 )
 data class Attachment(
     val url: String,
