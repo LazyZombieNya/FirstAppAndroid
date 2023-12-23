@@ -21,12 +21,12 @@ private val empty = Post(
     author = "",
     authorAvatar ="",
     content = "",
-    published = "",
+    published = 0,
     likedByMe = false,
     likes = 0,
     shares = 0,
     views = 0,
-    video = "",
+    video = null,
     attachment = null
 )
 
@@ -122,7 +122,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun likeById(id: Long) {
+    fun likeById(id: Long, likedByMe: Boolean) {
+              viewModelScope.launch {
+                try {
+                    repository.likeById(id,likedByMe)
+                    _dataState.value = FeedModelState()
+                } catch (e: Exception) {
+                    _dataState.value = FeedModelState(error = true)
+                    toastErrorMsg("SAVE_ERROR")//R.string.error_save_post
+                }
+
 //        val old = _data.value?.posts.orEmpty().asReversed()
 //        val oldPost = old.find { it.id == id } ?: return
 //        val post = if (oldPost.likedByMe) {
@@ -150,9 +159,19 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //            })
 //        }
     }
+    }
 
 
     fun removeById(id: Long) {
+        viewModelScope.launch {
+            try {
+                repository.removeById(id)
+                _dataState.value = FeedModelState()
+            } catch (e: Exception) {
+                toastErrorMsg("REMOVE_ERROR")
+                _dataState.value = FeedModelState(error = true)
+            }
+        }
 //        val old = _data.value?.posts.orEmpty()
 //        repository.removeByIdAsync(id, object : PostRepository.RemoveCallback {
 //            override fun onSuccess(result: Unit) {

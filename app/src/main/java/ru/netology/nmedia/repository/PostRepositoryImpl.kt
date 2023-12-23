@@ -14,21 +14,52 @@ import ru.netology.nmedia.error.UnknownError
 
 class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     override val data = dao.getAll().map(List<PostEntity>::toDto)
+    private var responseErrMess: Pair<Int, String> = Pair(0, "")
+    override fun getErrMess(): Pair<Int, String> {
+        return responseErrMess
+    }
 
     override suspend fun getAll() {
         try {
+            saveOnServerCheck() //проверка текущий локальной БД на незаписанные посты на сервер, если такие есть то они пытаются отправится на сервер через save()
             val response = PostsApi.service.getAll()
             if (!response.isSuccessful) {
+                responseErrMess = Pair(response.code(), response.message())
                 throw ApiError(response.code(), response.message())
             }
+            val bodyRsponse = response.body() ?: throw ApiError(response.code(), response.message())
+            val entityList = bodyRsponse.toEntity() //Превращаем ответ в лист с энтити
 
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.toEntity())
+            dao.insert(entityList)// А вот здесь в Локальную БД вставляем из сети все посты
+            //А тут всем постам пришедшим с сервера ставим отметку тру
+            for (postEntity: PostEntity in entityList)
+            {
+                if (!postEntity.savedOnServer) {
+                    dao.saveOnServerSwitch(postEntity.id)
+                }
+            }
+
         } catch (e: IOException) {
+            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
             throw NetworkError
+
         } catch (e: Exception) {
+            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
+//        try {
+//            val response = PostsApi.service.getAll()
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//            dao.insert(body.toEntity())
+//        } catch (e: IOException) {
+//            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
     }
 
 //    override fun shareByIdAsync(
@@ -50,28 +81,105 @@ class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 //        })
 //    }
 
-    override suspend fun save(post: Post) {
+    suspend fun saveOnServerCheck() {
         try {
-            val response = PostsApi.service.save(post)
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+            for (postEntentety: PostEntity in dao.getAll().value?: emptyList()) {
+                if (!postEntentety.savedOnServer) {
+                    save(postEntentety.toDto())
+                }
             }
-
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
+            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
             throw NetworkError
         } catch (e: Exception) {
+            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
     }
+    override suspend fun save(post: Post) {
+        try {
+            val postEntentety = PostEntity.fromDto(post)
+            dao.insert(postEntentety) //при сохранении поста, в базу вносится интентети с отметкой что оно не сохарнено на сервере
+            val response = PostsApi.service.save(post.copy(id = 0)) //Если у поста айди 0 то сервер воспринимает его как новый
+            if (!response.isSuccessful) { //если отвтет с сервера не пришел, то отметка о не записи на сервер по прежнему фолс
+                responseErrMess = Pair(response.code(), response.message())
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            dao.saveOnServerSwitch(body.id)// исключение не брошено меняем отметку о записи на сервере на тру
 
-    override suspend fun likeById(id: Long) {
-        TODO("Not yet implemented")
+        } catch (e: IOException) {
+            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            throw NetworkError
+        } catch (e: Exception) {
+            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            throw UnknownError
+        }
+        getAll()
+        }
+//        try {
+//            val response = PostsApi.service.save(post)
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//            dao.insert(PostEntity.fromDto(body))
+//        } catch (e: IOException) {
+//            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
+
+    override suspend fun likeById(id: Long, likedByMe: Boolean) {
+        try {
+            dao.likeById(id)
+            val response =
+                PostsApi.service.let { if (likedByMe) it.dislikeById(id) else it.likeById(id) }
+            if (!response.isSuccessful) {
+                responseErrMess = Pair(response.code(), response.message())
+                throw ApiError(response.code(), response.message())
+            }
+            response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: IOException) {
+            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            throw NetworkError
+
+        } catch (e: Exception) {
+            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            throw UnknownError
+        }
+//        try {
+//            val response = PostsApi.service.likeById(id)
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//            dao.likeById(id) //insert(PostEntity.fromDto(body))
+//        } catch (e: IOException) {
+//            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
     }
 
     override suspend  fun removeById(id: Long) {
-        TODO("Not yet implemented")
+        try {
+            dao.removeById(id)
+            val response = PostsApi.service.removeById(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: IOException) {
+            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            throw NetworkError
+
+        } catch (e: Exception) {
+            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            throw UnknownError
+        }
 
     }
 }

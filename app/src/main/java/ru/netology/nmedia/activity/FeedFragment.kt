@@ -31,7 +31,7 @@ import ru.netology.nmedia.service.NewPost
 import ru.netology.nmedia.util.AndroidUtils.toast
 import ru.netology.nmedia.viewmodel.PostViewModel
 
-class FeedFragment : Fragment(){
+class FeedFragment : Fragment() {
     //private var mSwipeRefreshLayout: SwipeRefreshLayout? = null
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +42,7 @@ class FeedFragment : Fragment(){
         val binding = FragmentFeedBinding.inflate(layoutInflater)
 
         val viewModel: PostViewModel by activityViewModels()
-        val actionMessage :String
+        val actionMessage: String
 
 
         binding.swiperefresh.setOnRefreshListener {
@@ -56,43 +56,56 @@ class FeedFragment : Fragment(){
 //        })
 
         viewModel.toast.observe(viewLifecycleOwner, Observer {
-                when (PostViewModel.ErrorAction.valueOf(it)) {
-                    PostViewModel.ErrorAction.LOAD_POST_ERROR -> {
-                        Toast.makeText(context, getString(R.string.error_loading), Toast.LENGTH_LONG).show()
+            when (PostViewModel.ErrorAction.valueOf(it)) {
+                PostViewModel.ErrorAction.LOAD_POST_ERROR -> {
+                    Toast.makeText(context, getString(R.string.error_loading), Toast.LENGTH_LONG)
+                        .show()
 
-                    }
-                    PostViewModel.ErrorAction.SAVE_ERROR -> {
-                        Toast.makeText(context, getString(R.string.error_save_post), Toast.LENGTH_LONG).show()
-
-                    }
-                    PostViewModel.ErrorAction.REMOVE_ERROR -> {
-                        Toast.makeText(context, getString(R.string.error_remove_post), Toast.LENGTH_LONG).show()
-
-                    }
-                    PostViewModel.ErrorAction.SHARE_ERROR -> {
-                        Toast.makeText(context, getString(R.string.error_unlike), Toast.LENGTH_LONG).show()
-
-                    }
-                    PostViewModel.ErrorAction.LIKE_ERROR -> {
-                        Toast.makeText(context, getString(R.string.error_like), Toast.LENGTH_LONG).show()
-
-                    }
-                    PostViewModel.ErrorAction.UNLIKE_ERROR -> {
-                        Toast.makeText(context, getString(R.string.error_unlike), Toast.LENGTH_LONG).show()
-
-                    }
                 }
+
+                PostViewModel.ErrorAction.SAVE_ERROR -> {
+                    Toast.makeText(context, getString(R.string.error_save_post), Toast.LENGTH_LONG)
+                        .show()
+
+                }
+
+                PostViewModel.ErrorAction.REMOVE_ERROR -> {
+                    Toast.makeText(
+                        context,
+                        getString(R.string.error_remove_post),
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                }
+
+                PostViewModel.ErrorAction.SHARE_ERROR -> {
+                    Toast.makeText(context, getString(R.string.error_unlike), Toast.LENGTH_LONG)
+                        .show()
+
+                }
+
+                PostViewModel.ErrorAction.LIKE_ERROR -> {
+                    Toast.makeText(context, getString(R.string.error_like), Toast.LENGTH_LONG)
+                        .show()
+
+                }
+
+                PostViewModel.ErrorAction.UNLIKE_ERROR -> {
+                    Toast.makeText(context, getString(R.string.error_unlike), Toast.LENGTH_LONG)
+                        .show()
+
+                }
+            }
         })
 
 
-
-
-        val adapter = PostAdapter(object: OnInteractionListener{
-            override fun onRefresh(){}
+        val adapter = PostAdapter(object : OnInteractionListener {
+            override fun onRefresh() {}
 
             override fun like(post: Post) {
-                viewModel.likeById(post.id)
+                viewModel.likeById(post.id, post.likedByMe)
             }
+
             override fun onShare(post: Post) {
                 val intent = Intent().apply {
                     action = Intent.ACTION_SEND
@@ -105,6 +118,7 @@ class FeedFragment : Fragment(){
                 startActivity(shareIntent)
                 viewModel.shareById(post.id)
             }
+
             override fun video(post: Post) {
                 val intent = Intent().apply {
                     action = Intent.ACTION_VIEW
@@ -116,8 +130,11 @@ class FeedFragment : Fragment(){
             }
 
             override fun clickPost(post: Post) {
-                findNavController().navigate(R.id.action_feedFragment_to_detailsFragmentPost,Bundle().also {  it.id = post.id })
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_detailsFragmentPost,
+                    Bundle().also { it.id = post.id })
             }
+
             override fun remove(post: Post) {
 
                 viewModel.removeById(post.id)
@@ -125,7 +142,9 @@ class FeedFragment : Fragment(){
             }
 
             override fun edit(post: Post) {
-                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment,Bundle().also { it.text = post.content }) //TODO
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_newPostFragment,
+                    Bundle().also { it.text = post.content }) //TODO
                 viewModel.edit(post)
             }
 
@@ -134,6 +153,7 @@ class FeedFragment : Fragment(){
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
             binding.swiperefresh.isRefreshing = state.refreshing
+            binding.errorGroup.isVisible = state.error
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
                     .setAction(R.string.retry_loading) { viewModel.loadPosts() }

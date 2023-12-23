@@ -4,13 +4,13 @@ data class Post(
     val id: Long,
     val author: String,
     val authorAvatar:String,
-    val published: String,
+    val published: Long,
     val content: String,
     val likedByMe: Boolean=false,
     val likes: Int,
     val shares:Int,
     val views:Int,
-    val video:String,
+    val video: String?,
     val attachment: Attachment?
 )
 data class Attachment(

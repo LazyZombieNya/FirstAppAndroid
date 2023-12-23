@@ -56,7 +56,7 @@ class PostViewHolder(
                 .into(binding.avatar)
 
             author.text = post.author
-            published.text = post.published
+            published.text = post.published.toString()
 
             editContent.text = post.content
             countView.text = NiceNumberDisplay.shortNumber(post.views)

@@ -19,7 +19,7 @@ data class PostEntity(
     @ColumnInfo(name = "authorAvatar", defaultValue = "netology.jpg")
     val authorAvatar:String,
     @ColumnInfo(name = "published", defaultValue = "now")
-    val published: String,
+    val published: Long,
     val content: String,
     @ColumnInfo(name = "likedByMe", defaultValue = "0")
     val likedByMe: Boolean,
@@ -30,9 +30,10 @@ data class PostEntity(
     @ColumnInfo(name = "views", defaultValue = "0")
     val views:Int,
     @ColumnInfo(name = "video", defaultValue = "")
-    val video:String,
+    val video:String?,
     @Embedded(prefix = "attachment_")
-    val attachment: Attachment?
+    val attachment: Attachment?,
+    val savedOnServer: Boolean = false,
 ){
     fun toDto() = Post(id, author,authorAvatar,published, content , likedByMe, likes,shares,views,video, attachment)
 
