@@ -23,6 +23,7 @@
     <string name="error_unlike">Unlike error</string>
     <string name="error_save_post" >Error saving post</string>
     <string name="error_remove_post" >Error deleting post</string>
+    <string name="read_new_posts">Read new posts</string>
 
 
 </resources>

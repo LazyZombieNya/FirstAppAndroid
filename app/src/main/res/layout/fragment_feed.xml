@@ -11,7 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".activity.FeedFragment">
-
+        <Button
+            android:id="@+id/readNewPosts"
+            android:text="@string/read_new_posts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="@dimen/common_spacing"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
         <TextView
             android:id="@+id/retryTitle"
             android:layout_width="wrap_content"
