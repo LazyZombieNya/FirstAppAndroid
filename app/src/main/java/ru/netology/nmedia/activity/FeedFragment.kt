@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.RemoteMessage
@@ -161,8 +162,32 @@ class FeedFragment : Fragment() {
             }
         }
         viewModel.data.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.posts)
+            val newPost = state.posts.size > adapter.currentList.size && adapter.itemCount>0
+            adapter.submitList(state.posts){
+                if (newPost){
+                    binding.list.smoothScrollToPosition(0)
+                }
+            }
             binding.emptyText.isVisible = state.empty
+        }
+
+        //автоматический скрол списка постов в начало после добавления
+        adapter.registerAdapterDataObserver(object :RecyclerView.AdapterDataObserver(){
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                 if (positionStart == 0){
+                     binding.list.smoothScrollToPosition(0)
+                     binding.readNewPosts.isVisible=false
+                 }
+            }
+        })
+
+        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
+            binding.readNewPosts.isVisible = state>0
+            println(state)
+        }
+
+        binding.readNewPosts.setOnClickListener{
+            viewModel.readAll()
         }
 
 //        binding.swiperefresh.setOnRefreshListener {
