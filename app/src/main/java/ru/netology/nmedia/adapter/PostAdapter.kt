@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
@@ -30,9 +31,7 @@ class PostAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return PostViewHolder(binding,onInteractionListener)
-
     }
-
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = getItem(position)
@@ -47,7 +46,7 @@ class PostViewHolder(
     fun bind(post: Post){
         binding.apply {
             val avatarName = post.authorAvatar
-            val url = "http://10.0.2.2:9999/avatars/${avatarName}"
+            val url = "${BuildConfig.BASE_URL}/avatars/${avatarName}"
             Glide.with(binding.avatar)
                 .load(url)
                 .circleCrop()
@@ -57,7 +56,7 @@ class PostViewHolder(
                 .into(binding.avatar)
 
             author.text = post.author
-            published.text = post.published
+            published.text = post.published.toString()
 
             editContent.text = post.content
             countView.text = NiceNumberDisplay.shortNumber(post.views)

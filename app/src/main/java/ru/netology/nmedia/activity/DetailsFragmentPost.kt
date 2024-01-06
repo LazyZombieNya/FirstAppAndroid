@@ -52,7 +52,7 @@ class DetailsFragmentPost : Fragment() {
 
 
             binding.author.text = post.author
-            binding.published.text = post.published
+            binding.published.text = post.published.toString()
             binding.editContent.text = post.content
             binding.like.isChecked = post.likedByMe
 
@@ -86,11 +86,11 @@ class DetailsFragmentPost : Fragment() {
                 viewModel.edit(post)
             }
 
-            binding.like.setOnClickListener {
-                if (id != null) {
-                    viewModel.likeById(id)
-                }
-            }
+//            binding.like.setOnClickListener {
+//                if (id != null) {
+//                    viewModel.likeById(id)
+//                }
+//            }
             binding.share.setOnClickListener {
                 if (id != null) {
                     val intent = Intent().apply {
