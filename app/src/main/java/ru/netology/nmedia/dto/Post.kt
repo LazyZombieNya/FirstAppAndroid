@@ -11,10 +11,9 @@ data class Post(
     val shares:Int,
     val views:Int,
     val video: String?,
-    val attachment: Attachment?
+    val attachment: Attachment? =null
 )
 data class Attachment(
     val url: String,
-    val description: String?,
-    val type: String
+    val type: AttachmentType,
 )

@@ -9,9 +9,15 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
+import retrofit2.Response
 import ru.netology.nmedia.api.*
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dto.Attachment
+import ru.netology.nmedia.dto.AttachmentType
+import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
@@ -20,6 +26,8 @@ import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
+import ru.netology.nmedia.model.PhotoModel
+import java.io.File
 
 
 class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
@@ -33,6 +41,13 @@ class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun readAllPost() {
         dao.readAll()
+    }
+
+
+
+    private suspend fun saveMedia(file: File):Response<Media>{
+        val part = MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
+        return PostsApi.service.saveMedia(part)
     }
 
     override suspend fun getAll() {
@@ -149,6 +164,49 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
             throw UnknownError
         }
     }
+    override suspend fun saveWithAttachment(post: Post, photoModel: PhotoModel) {
+        try {
+
+            val mediaResponse = saveMedia(photoModel.file)
+            if (!mediaResponse.isSuccessful) {
+                responseErrMess = Pair(mediaResponse.code(), mediaResponse.message())
+                throw ApiError(mediaResponse.code(), mediaResponse.message())
+            }
+            val media = mediaResponse.body() ?: throw ApiError(
+                mediaResponse.code(),
+                mediaResponse.message()
+            )
+
+//            val postEntentety = PostEntity.fromDto(post)
+//            dao.insert(postEntentety)
+
+            val response = PostsApi.service.save(
+                post.copy(
+
+                    attachment = Attachment(
+                        media.id,
+                        AttachmentType.IMAGE
+                    )
+                )
+            )
+
+            if (!response.isSuccessful) {
+                responseErrMess = Pair(response.code(), response.message())
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            dao.saveOnServerSwitch(body.id)
+
+        } catch (e: IOException) {
+            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            throw NetworkError
+        } catch (e: Exception) {
+            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            throw UnknownError
+        }
+        getAll()
+
+    }
     override suspend fun save(post: Post) {
         try {
             val postEntentety = PostEntity.fromDto(post)
@@ -169,7 +227,7 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
             throw UnknownError
         }
         getAll()
-        }
+    }
 //        try {
 //            val response = PostsApi.service.save(post)
 //            if (!response.isSuccessful) {

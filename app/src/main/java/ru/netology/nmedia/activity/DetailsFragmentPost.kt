@@ -64,7 +64,7 @@ class DetailsFragmentPost : Fragment() {
            if (post.attachment!=null){
                 binding.attachmentImage.visibility = View.VISIBLE
                 val attachmentUrl = post.attachment.url
-                val url = "http://10.0.2.2:9999/images/${attachmentUrl}"
+                val url = "http://10.0.2.2:9999/media/${attachmentUrl}"
                 Glide.with(binding.attachmentImage)
                     .load(url)
                     .placeholder(R.drawable.ic_loading_100dp)
@@ -91,6 +91,10 @@ class DetailsFragmentPost : Fragment() {
 //                    viewModel.likeById(id)
 //                }
 //            }
+            binding.like.setOnClickListener {
+                viewModel.likeById(post.id, post.likedByMe)
+                binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
+            }
             binding.share.setOnClickListener {
                 if (id != null) {
                     val intent = Intent().apply {

@@ -24,4 +24,6 @@
     <string name="error_save_post">Ошибка сохранения поста</string>
     <string name="error_remove_post">Ошибка удаления поста</string>
     <string name="read_new_posts">Свежие записи</string>
+    <string name="save">Сохранить</string>
+    <string name="remove">Удалить</string>
 </resources>
