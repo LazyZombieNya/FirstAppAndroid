@@ -74,7 +74,7 @@ class DetailsFragmentPost : Fragment() {
             } else {
                 binding.attachmentImage.visibility = View.GONE
             }
-
+            binding.like.isChecked = post.likedByMe
             binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
             binding.share.text = NiceNumberDisplay.shortNumber(post.shares)
             binding.countView.text = NiceNumberDisplay.shortNumber(post.views)

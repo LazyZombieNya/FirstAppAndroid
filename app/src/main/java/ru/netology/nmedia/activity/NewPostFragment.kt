@@ -40,8 +40,8 @@ class NewPostFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentNewPostBinding.inflate(layoutInflater)
 
+        val binding = FragmentNewPostBinding.inflate(layoutInflater)
         val viewModel: PostViewModel by activityViewModels()
         val postContent = arguments?.text
 
@@ -92,11 +92,10 @@ class NewPostFragment : Fragment() {
                         activity?.deleteSharedPreferences("MyPref")//Удаляет сохраннее данные из черновика
                         true
                     }
-
                     else -> false
                 }
 
-        })
+        }, viewLifecycleOwner)
 
         binding.remove.setOnClickListener{
             viewModel.clearPhoto()
@@ -110,6 +109,7 @@ class NewPostFragment : Fragment() {
 //            }
 //            findNavController().navigateUp()
 //        }
+
         viewModel.postCreated.observe(viewLifecycleOwner) {
             viewModel.loadPosts()
             findNavController().navigateUp()
@@ -144,13 +144,9 @@ class NewPostFragment : Fragment() {
                 .createIntent( photoResultContract::launch)
         }
 
-        viewModel.postCreated.observe(viewLifecycleOwner) {
-            findNavController().navigateUp()
-        }
 
 
         return binding.root
     }
-
 
 }

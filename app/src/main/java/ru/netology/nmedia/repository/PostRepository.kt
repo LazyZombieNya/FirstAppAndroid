@@ -1,6 +1,6 @@
 package ru.netology.nmedia.repository
 
-import androidx.lifecycle.LiveData
+import ru.netology.nmedia.dto.Token
 import kotlinx.coroutines.flow.Flow
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.PhotoModel
@@ -15,4 +15,5 @@ interface PostRepository {
     fun getErrMess(): Pair<Int, String>
     suspend fun readAllPost()
     suspend fun saveWithAttachment(post: Post, photoModel: PhotoModel)
+    suspend fun requestToken(login: String, password: String): Token
 }

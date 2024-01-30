@@ -46,6 +46,7 @@ android {
     }
 }
 dependencies {
+    implementation("com.google.firebase:firebase-crashlytics-buildtools:2.9.9")
     val room_version = "2.6.1"
     val retrofit_version = "2.9.0"
     val retrofitgson_version = "2.9.0"

@@ -55,4 +55,9 @@
             android:id="@+id/action_detailsFragmentPost_to_feedFragment"
             app:destination="@id/feedFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/authFragment"
+        android:name="ru.netology.nmedia.activity.AuthFragment"
+        android:label="fragment_authentication"
+        tools:layout="@layout/fragment_authentication" />
 </navigation>
