@@ -33,7 +33,7 @@ data class PostEntity(
     val video:String?,
     val hidden:Boolean = false,
     @Embedded(prefix = "attachment_")
-    val attachment: Attachment?,
+    val attachment: Attachment?=null,
     val savedOnServer: Boolean = false,
 ){
     fun toDto() = Post(id, author,authorAvatar,published, content , likedByMe, likes,shares,views,video, attachment)

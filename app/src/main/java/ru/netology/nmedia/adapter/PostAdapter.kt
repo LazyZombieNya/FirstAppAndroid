@@ -20,6 +20,7 @@ interface OnInteractionListener{
     fun edit(post: Post)
     fun onShare(post: Post)
     fun video(post: Post)
+    fun image(post: Post)
     fun clickPost(post: Post)
     fun onRefresh()
 }
@@ -68,7 +69,7 @@ class PostViewHolder(
             if (post.attachment!=null){
                 binding.attachmentImage.visibility = View.VISIBLE
                 val attachmentUrl = post.attachment.url
-                val url = "http://10.0.2.2:9999/images/${attachmentUrl}"
+                val url = "http://10.0.2.2:9999/media/${attachmentUrl}"
                 Glide.with(binding.attachmentImage)
                     .load(url)
                     .placeholder(R.drawable.ic_loading_100dp)
@@ -86,15 +87,18 @@ class PostViewHolder(
             videoContent?.setOnClickListener {
                 onInteractionListener.video(post)
             }
+            attachmentImage?.setOnClickListener{
+                onInteractionListener.image(post)
+            }
             //чтобы ссылки не мешали когда кликаешь на editContent
-            val rootClickListener = View.OnClickListener {
+//            val rootClickListener = View.OnClickListener {
+//                //onInteractionListener.clickPost(post)
+//            }
+//            root.setOnClickListener(rootClickListener)
+//            editContent.setOnClickListener(rootClickListener)
+            root?.setOnClickListener {
                 onInteractionListener.clickPost(post)
             }
-            root.setOnClickListener(rootClickListener)
-            editContent.setOnClickListener(rootClickListener)
-//            root?.setOnClickListener {
-//                onInteractionListener.clickPost(post)
-//            }
 
             like?.setOnClickListener {
                 onInteractionListener.like(post)

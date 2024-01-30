@@ -51,6 +51,7 @@ dependencies {
     val retrofitgson_version = "2.9.0"
     val okhttplogging_version = "4.12.0"
     val lifecycle_version = "2.2.0"
+    val imagepicker_version = "2.1"
 
 
 
@@ -81,6 +82,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+    implementation ("com.github.dhaval2404:imagepicker:$imagepicker_version")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

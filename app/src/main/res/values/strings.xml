@@ -3,14 +3,14 @@
     <string name="nmedia">NMedia!</string>
     <string name="post_avatar">"Post avatar"</string>
     <string name="post_like">"Likes"</string>
-    <string name="menu_remove" >Delete</string>
-    <string name="menu_edit" >Edit</string>
-    <string name="post_text" >Post text</string>
-    <string name="error_empty_content" >The input field must not be empty</string>
+    <string name="menu_remove">Delete</string>
+    <string name="menu_edit">Edit</string>
+    <string name="post_text">Post text</string>
+    <string name="error_empty_content">The input field must not be empty</string>
     <string name="editMesage">Edit Message</string>
-    <string name="post_share" >Share post</string>
-    <string name="description_post_save" >Save post</string>
-    <string name="add_post" >Add new post</string>
+    <string name="post_share">Share post</string>
+    <string name="description_post_save">Save post</string>
+    <string name="add_post">Add new post</string>
     <string name="google_play_unavailable">Google Api Unavailable</string>
     <string name="notification_user_liked">User %1$s liked %2$s\'s post</string>
     <string name="notification_user_add_new_post"> %1$s published a new post: </string>
@@ -21,9 +21,13 @@
     <string name="error_loading">Something went wrong. Try again later</string>
     <string name="error_like">Like  error</string>
     <string name="error_unlike">Unlike error</string>
-    <string name="error_save_post" >Error saving post</string>
-    <string name="error_remove_post" >Error deleting post</string>
+    <string name="error_save_post">Error saving post</string>
+    <string name="error_remove_post">Error deleting post</string>
     <string name="read_new_posts">Read new posts</string>
+    <string name="save">Save</string>
+    <string name="remove">Remove</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

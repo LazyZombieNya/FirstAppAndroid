@@ -130,6 +130,13 @@ class FeedFragment : Fragment() {
 
             }
 
+            override fun image(post: Post) {
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_imageFragment,
+                    Bundle().also { it.id = post.id })
+
+            }
+
             override fun clickPost(post: Post) {
                 findNavController().navigate(
                     R.id.action_feedFragment_to_detailsFragmentPost,
@@ -145,7 +152,7 @@ class FeedFragment : Fragment() {
             override fun edit(post: Post) {
                 findNavController().navigate(
                     R.id.action_feedFragment_to_newPostFragment,
-                    Bundle().also { it.text = post.content }) //TODO
+                    Bundle().also { it.text = post.content })
                 viewModel.edit(post)
             }
 

@@ -20,6 +20,19 @@
         <action
             android:id="@+id/action_feedFragment_to_detailsFragmentPost"
             app:destination="@id/detailsFragmentPost" />
+        <action
+            android:id="@+id/action_feedFragment_to_imageFragment"
+            app:destination="@id/imageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/imageFragment"
+        android:name="ru.netology.nmedia.activity.ImageFragment"
+        android:label="fragment_image_post"
+        tools:layout="@layout/fragment_image_post">
+
+        <action
+            android:id="@+id/action_imageFragment_to_feedFragment"
+            app:destination="@id/feedFragment" />
     </fragment>
     <fragment
         android:id="@+id/newPostFragment"

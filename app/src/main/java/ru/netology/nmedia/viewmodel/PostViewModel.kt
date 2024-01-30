@@ -1,6 +1,7 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,9 +18,11 @@ import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.model.FeedModelState
+import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent
+import java.io.File
 
 private val empty = Post(
     id = 0,
@@ -57,6 +60,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             .asLiveData(Dispatchers.Default,100)
     }
 
+    private val _photo = MutableLiveData<PhotoModel?>(null)
+    val photo:LiveData<PhotoModel?>
+        get()= _photo
+
     val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
@@ -64,7 +71,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     init {
         loadPosts()
     }
-
 
     val toast : LiveData<String>
         get() = toastLiveData
@@ -84,6 +90,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         loadPosts()
     }
 
+    fun setPhoto(uri:Uri, file: File){
+        _photo.value = PhotoModel(uri, file)
+    }
     enum class ErrorAction {
         LOAD_POST_ERROR,
         LIKE_ERROR,
@@ -115,11 +124,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun save() {
         edited.value?.let {
-            _postCreated.value = Unit
             viewModelScope.launch {
                 try {
-                    repository.save(it)
+                    val photoModel = _photo.value
+                    if (photoModel == null) {
+                        repository.save(it)
+                    }else{
+                        repository.saveWithAttachment(it,photoModel)
+                    }
                     _dataState.value = FeedModelState()
+                    _postCreated.value = Unit
                 } catch (e: Exception) {
                     _dataState.value = FeedModelState(error = true)
                     toastErrorMsg("SAVE_ERROR")//R.string.error_save_post
@@ -227,6 +241,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun edit(post: Post) {
         edited.value = post
+    }
+
+    fun clearPhoto() {
+        _photo.value = null
     }
 
 }
