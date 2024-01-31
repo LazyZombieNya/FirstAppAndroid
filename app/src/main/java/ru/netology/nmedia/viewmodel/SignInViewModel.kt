@@ -16,7 +16,7 @@ import ru.netology.nmedia.util.SingleLiveEvent
 class SignInViewModel (application: Application) : AndroidViewModel(application) {
 
     private val _auth = SingleLiveEvent<Unit>()
-    val auth: LiveData<Unit>
+    val auth: SingleLiveEvent<Unit>
         get() = _auth
 
     private val repository: PostRepository =
