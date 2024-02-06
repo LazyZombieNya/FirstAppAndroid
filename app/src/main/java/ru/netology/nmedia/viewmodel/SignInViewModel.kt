@@ -3,7 +3,6 @@ package ru.netology.nmedia.viewmodel
 import android.app.Application
 
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth

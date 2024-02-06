@@ -82,6 +82,7 @@ dependencies {
     implementation ("com.sarveshathawale:kotlintoasts:1.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
     implementation ("com.github.dhaval2404:imagepicker:$imagepicker_version")
 

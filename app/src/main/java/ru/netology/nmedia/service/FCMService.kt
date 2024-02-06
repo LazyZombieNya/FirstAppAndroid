@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -16,6 +17,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.AppActivity
+import ru.netology.nmedia.auth.AppAuth
 import kotlin.random.Random
 
 
@@ -40,22 +42,36 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
+        //val content = Gson().fromJson(message.data["content"], PushContent::class.java).content.toString()
+        val recipientId = Gson().fromJson(message.data["content"], PushContent::class.java).recipientId
+        val id = AppAuth.getInstance().authState.value.id
 
-        message.data[action]?.let {
-            if (!Action.values().map { action -> action.name }.contains(it)) return
-            when (Action.valueOf(it)) {
-                Action.LIKE -> {
-                    handleLike(gson.fromJson(message.data[content], Like::class.java))
-                }
-                Action.NEW_POST -> {
-                    handleNewPost(gson.fromJson(message.data[content], NewPost::class.java))
-                }
-            }
+        Log.d("FCMService", message.data.toString())
+        Log.d("FCMService", id.toString())
+
+        when (recipientId) {
+            null -> handlePushContent(gson.fromJson(message.data[content], PushContent::class.java))
+            id -> handlePushContent(gson.fromJson(message.data[content], PushContent::class.java))
+            else -> AppAuth.getInstance().sendPushToken()
         }
-        println(Gson().toJson(message))
+//        Log.d("FCMService", message.data["content"].toString())
+//        Log.d("FCMService", Gson().fromJson(message.data["content"], PushContent::class.java).recipientId.toString())
+//        message.data[action]?.let {
+//            if (!Action.values().map { action -> action.name }.contains(it)) return
+//            when (Action.valueOf(it)) {
+//                Action.LIKE -> {
+//                    handleLike(gson.fromJson(message.data[content], Like::class.java))
+//                }
+//                Action.NEW_POST -> {
+//                    handleNewPost(gson.fromJson(message.data[content], NewPost::class.java))
+//                }
+//            }
+//        }
+//        println(Gson().toJson(message))
     }
 
     override fun onNewToken(token: String) {
+        AppAuth.getInstance().sendPushToken(token)
         println(token)
     }
 
@@ -86,6 +102,27 @@ class FCMService : FirebaseMessagingService() {
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(
                 getString(R.string.notification_user_add_new_post, content.userName)
+            )
+            .setContentText(content.content)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(content.content)
+            )
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pi)
+            .setAutoCancel(true)
+            .build()
+
+        notify(notification)
+    }
+
+    private fun handlePushContent(content: PushContent) {
+        val intent = Intent(this, AppActivity::class.java)
+        val pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(
+                getString(R.string.notification_push_content, content.content)
             )
             .setContentText(content.content)
             .setStyle(
@@ -131,4 +168,10 @@ data class NewPost(
     val postId: Long,
     val postAuthor: String,
     val content: String,
+)
+
+data class PushContent(
+    val recipientId: Long?,
+    val content: String,
+
 )

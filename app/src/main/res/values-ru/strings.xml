@@ -32,4 +32,5 @@
     <string name="login">Логин</string>
     <string name="password">Пароль</string>
     <string name="empty_login">Введите логин</string>
+    <string name="notification_push_content">Вам сообщение: </string>
 </resources>
