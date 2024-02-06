@@ -22,11 +22,13 @@
             android:layout_height="wrap_content"
             android:background="?selectableItemBackground"
             android:padding="@dimen/common_spacing"
+            android:layout_weight="1"
             android:src="@drawable/ic_baseline_keyboard_backspace_24"
             app:tint="@color/white" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_weight="5"
             android:textColor="@color/white"
             android:gravity="center_horizontal|center_vertical"
             android:textSize="20dp"
@@ -35,6 +37,7 @@
 
         <ImageView
             android:id="@+id/menu"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?selectableItemBackground"

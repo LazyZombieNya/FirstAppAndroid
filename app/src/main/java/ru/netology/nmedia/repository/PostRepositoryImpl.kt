@@ -1,4 +1,5 @@
 package ru.netology.nmedia.repository
+import android.media.session.MediaSession
 import androidx.lifecycle.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.Token
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
 import ru.netology.nmedia.entity.toEntity
@@ -50,6 +52,24 @@ class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
         return PostsApi.service.saveMedia(part)
     }
 
+    override suspend fun requestToken(login: String, password: String): Token {
+        try {
+            val response = PostsApi.service.updateUser(login, password)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            return body
+
+        } catch (e: IOException) {
+            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            throw NetworkError
+
+        } catch (e: Exception) {
+            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            throw UnknownError
+        }
+    }
     override suspend fun getAll() {
         try {
             saveOnServerCheck() //проверка текущий локальной БД на незаписанные посты на сервер, если такие есть то они пытаются отправится на сервер через save()
