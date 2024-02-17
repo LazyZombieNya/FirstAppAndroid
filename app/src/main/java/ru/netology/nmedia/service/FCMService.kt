@@ -18,6 +18,7 @@ import com.google.gson.Gson
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.AppActivity
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.di.DependencyContainer
 import kotlin.random.Random
 
 
@@ -44,7 +45,7 @@ class FCMService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         //val content = Gson().fromJson(message.data["content"], PushContent::class.java).content.toString()
         val recipientId = Gson().fromJson(message.data["content"], PushContent::class.java).recipientId
-        val id = AppAuth.getInstance().authState.value.id
+        val id = DependencyContainer.getInstance().appAuth.authState.value.id
 
         Log.d("FCMService", message.data.toString())
         Log.d("FCMService", id.toString())
@@ -52,7 +53,7 @@ class FCMService : FirebaseMessagingService() {
         when (recipientId) {
             null -> handlePushContent(gson.fromJson(message.data[content], PushContent::class.java))
             id -> handlePushContent(gson.fromJson(message.data[content], PushContent::class.java))
-            else -> AppAuth.getInstance().sendPushToken()
+            else -> DependencyContainer.getInstance().appAuth.sendPushToken()
         }
 //        Log.d("FCMService", message.data["content"].toString())
 //        Log.d("FCMService", Gson().fromJson(message.data["content"], PushContent::class.java).recipientId.toString())
@@ -71,7 +72,7 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        AppAuth.getInstance().sendPushToken(token)
+        DependencyContainer.getInstance().appAuth.sendPushToken(token)
         println(token)
     }
 

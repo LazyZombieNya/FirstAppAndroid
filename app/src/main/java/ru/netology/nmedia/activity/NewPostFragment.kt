@@ -25,15 +25,17 @@ import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.viewmodel.PostViewModel
+import ru.netology.nmedia.viewmodel.ViewModelFactory
 
 
 class NewPostFragment : Fragment() {
     companion object {
         var Bundle.text: String? by StringArg
     }
-
+    private val dependencyContainer = DependencyContainer.getInstance()
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +44,10 @@ class NewPostFragment : Fragment() {
     ): View {
 
         val binding = FragmentNewPostBinding.inflate(layoutInflater)
-        val viewModel: PostViewModel by activityViewModels()
+        val viewModel: PostViewModel by viewModels(
+            ownerProducer = ::requireParentFragment,
+            factoryProducer = { ViewModelFactory(dependencyContainer.repository,dependencyContainer.appAuth) })
+
         val postContent = arguments?.text
 
 

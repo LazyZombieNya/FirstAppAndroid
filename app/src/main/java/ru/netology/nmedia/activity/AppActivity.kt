@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
@@ -26,12 +25,16 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
-import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.ActivityAppBinding
+import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.AuthViewModel
+import ru.netology.nmedia.viewmodel.ViewModelFactory
 
 class AppActivity : AppCompatActivity() {
-    val viewModel by viewModels<AuthViewModel> ()
+    val dependencyContainer = DependencyContainer.getInstance()
+    val viewModel by viewModels<AuthViewModel> (
+        factoryProducer = { ViewModelFactory(dependencyContainer.repository,dependencyContainer.appAuth) }
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityAppBinding.inflate(layoutInflater)
@@ -86,11 +89,11 @@ class AppActivity : AppCompatActivity() {
                         true
                     }
                     R.id.signup ->{
-                        AppAuth.getInstance().setAuth(5, "x-token")
+                        dependencyContainer.appAuth.setAuth(5, "x-token")
                         true
                     }
                     R.id.signout ->{
-                        AppAuth.getInstance().removeAuth()
+                        dependencyContainer.appAuth.removeAuth()
                         true
                     }
                     else -> false
