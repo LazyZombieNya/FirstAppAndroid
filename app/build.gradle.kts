@@ -3,6 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
     id("com.google.gms.google-services")
+    id("com.google.dagger.hilt.android")
+
 }
 
 android {
@@ -53,6 +55,7 @@ dependencies {
     val okhttplogging_version = "4.12.0"
     val lifecycle_version = "2.2.0"
     val imagepicker_version = "2.1"
+    val hilt_version = "2.50"
 
 
 
@@ -85,6 +88,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
     implementation ("com.github.dhaval2404:imagepicker:$imagepicker_version")
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
