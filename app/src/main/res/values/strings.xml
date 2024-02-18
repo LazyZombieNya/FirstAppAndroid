@@ -32,6 +32,7 @@
     <string name="login">Login</string>
     <string name="password">Password</string>
     <string name="empty_login">Enter login</string>
+    <string name="notification_push_content">Message for you:</string>
 
 
 </resources>
