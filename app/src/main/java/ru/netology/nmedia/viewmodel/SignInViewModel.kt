@@ -1,23 +1,19 @@
 package ru.netology.nmedia.viewmodel
 
-import android.app.Application
-
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
-import ru.netology.nmedia.db.AppDb
-import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.dto.Token
 import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent
+import javax.inject.Inject
+@HiltViewModel
+class SignInViewModel @Inject constructor(
+    private val repository: PostRepository,
+    private val appAuth: AppAuth
 
-class SignInViewModel (
-    application: Application,
-    private val appAuth: AppAuth,
-    private val repository: PostRepository
 ) : ViewModel() {
 
     private val _auth = SingleLiveEvent<Unit>()

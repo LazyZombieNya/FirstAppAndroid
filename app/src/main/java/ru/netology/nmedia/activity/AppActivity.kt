@@ -22,19 +22,22 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.ActivityAppBinding
-import ru.netology.nmedia.di.DependencyContainer
 import ru.netology.nmedia.viewmodel.AuthViewModel
-import ru.netology.nmedia.viewmodel.ViewModelFactory
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity() {
-    val dependencyContainer = DependencyContainer.getInstance()
-    val viewModel by viewModels<AuthViewModel> (
-        factoryProducer = { ViewModelFactory(dependencyContainer.repository,dependencyContainer.appAuth) }
-    )
+
+    @Inject
+    lateinit var appAuth:AppAuth
+
+    val viewModel by viewModels<AuthViewModel> ()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityAppBinding.inflate(layoutInflater)
@@ -89,11 +92,11 @@ class AppActivity : AppCompatActivity() {
                         true
                     }
                     R.id.signup ->{
-                        dependencyContainer.appAuth.setAuth(5, "x-token")
+                        appAuth.setAuth(5, "x-token")
                         true
                     }
                     R.id.signout ->{
-                        dependencyContainer.appAuth.removeAuth()
+                        appAuth.removeAuth()
                         true
                     }
                     else -> false

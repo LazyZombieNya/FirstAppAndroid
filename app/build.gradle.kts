@@ -4,8 +4,15 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
     id("com.google.gms.google-services")
     id("com.google.dagger.hilt.android")
-
 }
+
+//    apply plugin: ("com.android.application")
+//    apply plugin: 'kotlin-android'
+//    apply plugin: 'kotlin-kapt'
+//    apply plugin: 'com.google.gms.google-services'
+//    apply plugin: 'dagger.hilt.android.plugin'
+
+
 
 android {
     namespace = "ru.netology.nmedia"
@@ -55,7 +62,7 @@ dependencies {
     val okhttplogging_version = "4.12.0"
     val lifecycle_version = "2.2.0"
     val imagepicker_version = "2.1"
-    val hilt_version = "2.50"
+    val hilt_version = "2.44"
 
 
 
@@ -94,4 +101,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+}
+kapt {
+    correctErrorTypes = true
 }

@@ -31,7 +31,7 @@ import javax.inject.Inject
 
 class  PostRepositoryImpl @Inject constructor(
     private val dao: PostDao,
-    private val apiService: PostsApiService,
+    private val apiService: ApiService,
 ) : PostRepository {
     override val data = dao.getAll()
         .map(List<PostEntity>::toDto)

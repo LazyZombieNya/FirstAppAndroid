@@ -57,5 +57,5 @@ class ApiModule {
     @Singleton
     fun provideApiService(
         retrofit: Retrofit
-    ):PostsApiService = retrofit.create()
+    ):ApiService = retrofit.create()
 }
