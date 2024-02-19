@@ -6,13 +6,6 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
-//    apply plugin: ("com.android.application")
-//    apply plugin: 'kotlin-android'
-//    apply plugin: 'kotlin-kapt'
-//    apply plugin: 'com.google.gms.google-services'
-//    apply plugin: 'dagger.hilt.android.plugin'
-
-
 
 android {
     namespace = "ru.netology.nmedia"
@@ -62,7 +55,7 @@ dependencies {
     val okhttplogging_version = "4.12.0"
     val lifecycle_version = "2.2.0"
     val imagepicker_version = "2.1"
-    val hilt_version = "2.44"
+    val hilt_version = "2.49"
 
 
 
