@@ -1,7 +1,5 @@
 package ru.netology.nmedia.repository
-import android.media.session.MediaSession
 import androidx.lifecycle.*
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -9,7 +7,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
@@ -25,14 +22,17 @@ import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
 import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.ApiError
-import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import ru.netology.nmedia.model.PhotoModel
 import java.io.File
+import javax.inject.Inject
 
 
-class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
+class  PostRepositoryImpl @Inject constructor(
+    private val dao: PostDao,
+    private val apiService: ApiService,
+) : PostRepository {
     override val data = dao.getAll()
         .map(List<PostEntity>::toDto)
         .flowOn(Dispatchers.Default)
@@ -49,12 +49,12 @@ class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
     private suspend fun saveMedia(file: File):Response<Media>{
         val part = MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
-        return PostsApi.service.saveMedia(part)
+        return apiService.saveMedia(part)
     }
 
     override suspend fun requestToken(login: String, password: String): Token {
         try {
-            val response = PostsApi.service.updateUser(login, password)
+            val response = apiService.updateUser(login, password)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
@@ -73,7 +73,7 @@ class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     override suspend fun getAll() {
         try {
             saveOnServerCheck() //проверка текущий локальной БД на незаписанные посты на сервер, если такие есть то они пытаются отправится на сервер через save()
-            val response = PostsApi.service.getAll()
+            val response = apiService.getAll()
             if (!response.isSuccessful) {
                 responseErrMess = Pair(response.code(), response.message())
                 throw ApiError(response.code(), response.message())
@@ -134,7 +134,7 @@ class  PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 override fun getNewerCount(id: Long): Flow<Int> =flow {
     while (true) {
         delay(10_000L)
-        val response = PostsApi.service.getNewer(id)
+        val response = apiService.getNewer(id)
         if (!response.isSuccessful) {
             responseErrMess = Pair(response.code(), response.message())
             throw ApiError(response.code(), response.message())
@@ -200,7 +200,7 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
 //            val postEntentety = PostEntity.fromDto(post)
 //            dao.insert(postEntentety)
 
-            val response = PostsApi.service.save(
+            val response = apiService.save(
                 post.copy(
 
                     attachment = Attachment(
@@ -231,7 +231,7 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
         try {
             val postEntentety = PostEntity.fromDto(post)
             dao.insert(postEntentety) //при сохранении поста, в базу вносится интентети с отметкой что оно не сохарнено на сервере
-            val response = PostsApi.service.save(post.copy(id = 0)) //Если у поста айди 0 то сервер воспринимает его как новый
+            val response = apiService.save(post.copy(id = 0)) //Если у поста айди 0 то сервер воспринимает его как новый
             if (!response.isSuccessful) { //если отвтет с сервера не пришел, то отметка о не записи на сервер по прежнему фолс
                 responseErrMess = Pair(response.code(), response.message())
                 throw ApiError(response.code(), response.message())
@@ -266,7 +266,7 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
         try {
             dao.likeById(id)
             val response =
-                PostsApi.service.let { if (likedByMe) it.dislikeById(id) else it.likeById(id) }
+                apiService.let { if (likedByMe) it.dislikeById(id) else it.likeById(id) }
             if (!response.isSuccessful) {
                 responseErrMess = Pair(response.code(), response.message())
                 throw ApiError(response.code(), response.message())
@@ -298,7 +298,7 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
     override suspend  fun removeById(id: Long) {
         try {
             dao.removeById(id)
-            val response = PostsApi.service.removeById(id)
+            val response = apiService.removeById(id)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
