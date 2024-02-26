@@ -11,10 +11,13 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
@@ -37,13 +40,6 @@ class FeedFragment : Fragment() {
         val binding = FragmentFeedBinding.inflate(layoutInflater)
 
         val actionMessage: String
-
-
-        binding.swiperefresh.setOnRefreshListener {
-            binding.swiperefresh.isRefreshing = false
-            viewModel.loadPosts()
-            //context?.toast("Update" )
-        }
 
 //        viewModel.toast.observe(viewLifecycleOwner, Observer {
 //            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
@@ -161,15 +157,20 @@ class FeedFragment : Fragment() {
                     .show()
             }
         }
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            val newPost = state.posts.size > adapter.currentList.size && adapter.itemCount>0
-            adapter.submitList(state.posts){
-                if (newPost){
-                    binding.list.smoothScrollToPosition(0)
-                }
+        lifecycleScope.launchWhenCreated {
+            viewModel.data.collectLatest {
+                adapter.submitData(it)
             }
-            binding.emptyText.isVisible = state.empty
         }
+//        viewModel.data.observe(viewLifecycleOwner) { state ->
+//            val newPost = state.posts.size > adapter.currentList.size && adapter.itemCount>0
+//            adapter.submitList(state.posts){
+//                if (newPost){
+//                    binding.list.smoothScrollToPosition(0)
+//                }
+//            }
+//            binding.emptyText.isVisible = state.empty
+//        }
 
         //автоматический скрол списка постов в начало после добавления
         adapter.registerAdapterDataObserver(object :RecyclerView.AdapterDataObserver(){
@@ -181,18 +182,30 @@ class FeedFragment : Fragment() {
             }
         })
 
-        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-            binding.readNewPosts.isVisible = state>0
-            println(state)
-        }
+//        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
+//            binding.readNewPosts.isVisible = state>0
+//            println(state)
+//        }
 
         binding.readNewPosts.setOnClickListener{
             viewModel.readAll()
         }
 
-//        binding.swiperefresh.setOnRefreshListener {
-//            viewModel.refreshPosts()
-//        }
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest {
+                binding.swiperefresh.isRefreshing= it.refresh is LoadState.Loading
+                        ||it.append is LoadState.Loading
+                        ||it.prepend is LoadState.Loading
+            }
+
+        }
+        binding.swiperefresh.setOnRefreshListener {
+            adapter.refresh()
+            //binding.swiperefresh.isRefreshing = false
+            //viewModel.loadPosts()
+            //context?.toast("Update" )
+        }
+
 
         binding.retryButton.setOnClickListener {
             viewModel.loadPosts()

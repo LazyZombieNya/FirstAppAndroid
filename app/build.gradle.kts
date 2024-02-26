@@ -56,6 +56,7 @@ dependencies {
     val lifecycle_version = "2.2.0"
     val imagepicker_version = "2.1"
     val hilt_version = "2.49"
+    val paging_version = "3.2.1"
 
 
 
@@ -89,6 +90,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
     implementation ("com.github.dhaval2404:imagepicker:$imagepicker_version")
     implementation("com.google.dagger:hilt-android:$hilt_version")
+    implementation("androidx.paging:paging-runtime-ktx:$paging_version")
     kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
 
     testImplementation("junit:junit:4.13.2")

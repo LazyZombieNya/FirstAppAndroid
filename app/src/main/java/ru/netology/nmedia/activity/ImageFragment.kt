@@ -10,15 +10,25 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResultListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
 import ru.netology.nmedia.databinding.FragmentImagePostBinding
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.NiceNumberDisplay
 import ru.netology.nmedia.viewmodel.PostViewModel
-
+@AndroidEntryPoint
 class ImageFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,12 +38,16 @@ class ImageFragment: Fragment() {
         val binding = FragmentImagePostBinding.inflate(layoutInflater)
 
         val viewModel: PostViewModel by activityViewModels()
-        val id: Long? = arguments?.id
+        //val id: Long? = arguments?.id
 
-        viewModel.data.observe(viewLifecycleOwner) { posts ->
-            val post = posts.posts.find { it.id == id } ?: run {
-                //findNavController().navigateUp()
-                return@observe
+        setFragmentResultListener("requestIdForImageFragment") { key, bundle ->
+            val result = bundle.getLong("id")
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val post =
+                    (viewModel.data.single().toList().filter { it -> it.id == result }[0] as Post)!!
+                        .copy()
 
             }
 
