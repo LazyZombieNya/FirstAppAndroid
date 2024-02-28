@@ -159,6 +159,7 @@ class PostViewModel @Inject constructor(
     }
 
 
+
     fun likeById(id: Long, likedByMe: Boolean) {
               viewModelScope.launch {
                 try {
@@ -198,6 +199,18 @@ class PostViewModel @Inject constructor(
     }
     }
 
+    fun getById(id: Long): Post? {
+        var post: Post? = null
+        viewModelScope.launch {
+            try {
+                post = repository.getById(id)
+            } catch (e: Exception) {
+                toastErrorMsg("REMOVE_ERROR")
+                _dataState.value = FeedModelState(error = true)
+            }
+        }
+        return post
+    }
 
     fun removeById(id: Long) {
         viewModelScope.launch {

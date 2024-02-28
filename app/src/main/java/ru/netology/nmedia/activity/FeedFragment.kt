@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
@@ -35,7 +37,7 @@ class FeedFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View{
+    ): View {
 
         val binding = FragmentFeedBinding.inflate(layoutInflater)
 
@@ -119,11 +121,17 @@ class FeedFragment : Fragment() {
 
             }
 
+            //            override fun image(post: Post) {
+//                findNavController().navigate(
+//                    R.id.action_feedFragment_to_imageFragment,
+//                    Bundle().also { it.id = post.id })
+//
+//            }
             override fun image(post: Post) {
                 findNavController().navigate(
                     R.id.action_feedFragment_to_imageFragment,
-                    Bundle().also { it.id = post.id })
-
+                    bundleOf("postJson" to Gson().toJson(post))
+                )
             }
 
             override fun clickPost(post: Post) {
@@ -173,12 +181,12 @@ class FeedFragment : Fragment() {
 //        }
 
         //автоматический скрол списка постов в начало после добавления
-        adapter.registerAdapterDataObserver(object :RecyclerView.AdapterDataObserver(){
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                 if (positionStart == 0){
-                     binding.list.smoothScrollToPosition(0)
-                     binding.readNewPosts.isVisible=false
-                 }
+                if (positionStart == 0) {
+                    binding.list.smoothScrollToPosition(0)
+                    binding.readNewPosts.isVisible = false
+                }
             }
         })
 
@@ -187,15 +195,15 @@ class FeedFragment : Fragment() {
 //            println(state)
 //        }
 
-        binding.readNewPosts.setOnClickListener{
+        binding.readNewPosts.setOnClickListener {
             viewModel.readAll()
         }
 
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest {
-                binding.swiperefresh.isRefreshing= it.refresh is LoadState.Loading
-                        ||it.append is LoadState.Loading
-                        ||it.prepend is LoadState.Loading
+                binding.swiperefresh.isRefreshing = it.refresh is LoadState.Loading
+                        || it.append is LoadState.Loading
+                        || it.prepend is LoadState.Loading
             }
 
         }

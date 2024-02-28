@@ -50,6 +50,21 @@ class  PostRepositoryImpl @Inject constructor(
         dao.readAll()
     }
 
+    override suspend fun getById(id: Long): Post {
+        try {
+            val response = apiService.getById(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            return response.body() ?: throw ApiError(response.code(), response.message())
+        } catch (e: IOException) {
+            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            throw NetworkError
+        } catch (e: Exception) {
+            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            throw UnknownError
+        }
+    }
 
 
     private suspend fun saveMedia(file: File):Response<Media>{
