@@ -1,7 +1,6 @@
 package ru.netology.nmedia.activity
 
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -34,104 +33,109 @@ class DetailsFragmentPost : Fragment() {
         val viewModel: PostViewModel by activityViewModels()
         val id: Long? = arguments?.id
 
-        viewModel.data.observe(viewLifecycleOwner) { posts ->
-            val post = posts.posts.find { it.id == id } ?: run {
-                //findNavController().navigateUp()
-                return@observe
+        var post = viewModel.getById(id ?: return binding.root) ?: return binding.root
+//        viewModel.data.observe(viewLifecycleOwner) { posts ->
+//            val post = posts.posts.find { it.id == id } ?: run {
+//                //findNavController().navigateUp()
+//                return@observe
+//
+//            }
+        val avatarName = post.authorAvatar
+        val url = "http://10.0.2.2:9999/avatars/${avatarName}"
+        Glide.with(binding.avatar)
+            .load(url)
+            .circleCrop()
+            .placeholder(R.drawable.ic_loading_100dp)
+            .error(R.drawable.ic_error_100dp)
+            .timeout(10_000)
+            .into(binding.avatar)
 
-            }
-            val avatarName = post.authorAvatar
-            val url = "http://10.0.2.2:9999/avatars/${avatarName}"
-            Glide.with(binding.avatar)
+
+        binding.author.text = post.author
+        binding.published.text = post.published.toString()
+        binding.editContent.text = post.content
+        binding.like.isChecked = post.likedByMe
+
+        if (!post.video.isNullOrBlank()) {
+            binding.videoContent.visibility = View.VISIBLE
+        } else {
+            binding.videoContent.visibility = View.GONE
+        }
+        if (post.attachment != null) {
+            binding.attachmentImage.visibility = View.VISIBLE
+            val attachmentUrl = post.attachment!!.url
+            val url = "http://10.0.2.2:9999/media/${attachmentUrl}"
+            Glide.with(binding.attachmentImage)
                 .load(url)
-                .circleCrop()
                 .placeholder(R.drawable.ic_loading_100dp)
                 .error(R.drawable.ic_error_100dp)
                 .timeout(10_000)
-                .into(binding.avatar)
+                .into(binding.attachmentImage)
+        } else {
+            binding.attachmentImage.visibility = View.GONE
+        }
+        binding.like.isChecked = post.likedByMe
+        binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
+        binding.share.text = NiceNumberDisplay.shortNumber(post.shares)
+        binding.countView.text = NiceNumberDisplay.shortNumber(post.views)
 
-
-            binding.author.text = post.author
-            binding.published.text = post.published.toString()
-            binding.editContent.text = post.content
-            binding.like.isChecked = post.likedByMe
-
-            if (!post.video.isNullOrBlank()){
-                binding.videoContent.visibility = View.VISIBLE
-            } else {
-                binding.videoContent.visibility = View.GONE
-            }
-           if (post.attachment!=null){
-                binding.attachmentImage.visibility = View.VISIBLE
-                val attachmentUrl = post.attachment.url
-                val url = "http://10.0.2.2:9999/media/${attachmentUrl}"
-                Glide.with(binding.attachmentImage)
-                    .load(url)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .timeout(10_000)
-                    .into(binding.attachmentImage)
-            } else {
-                binding.attachmentImage.visibility = View.GONE
-            }
-            binding.like.isChecked = post.likedByMe
-            binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
-            binding.share.text = NiceNumberDisplay.shortNumber(post.shares)
-            binding.countView.text = NiceNumberDisplay.shortNumber(post.views)
-
-            binding.edit.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_detailsFragmentPost_to_newPostFragment,
-                    Bundle().also { it.text = post.content })
-                viewModel.edit(post)
-            }
+        binding.edit.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_detailsFragmentPost_to_newPostFragment,
+                Bundle().also { it.text = post.content })
+            viewModel.edit(post)
+        }
 
 //            binding.like.setOnClickListener {
 //                if (id != null) {
 //                    viewModel.likeById(id)
 //                }
 //            }
-            binding.like.setOnClickListener {
-                viewModel.likeById(post.id, post.likedByMe)
-                binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
-            }
-            binding.share.setOnClickListener {
-                if (id != null) {
-                    val intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, post.content)
-                        type = "text/plain"
-                    }
-
-                    val shareIntent =
-                        Intent.createChooser(intent, getString(R.string.post_share))
-                    startActivity(shareIntent)
-                    viewModel.shareById(id)
+        binding.like.setOnClickListener {
+            viewModel.likeById(post.id, post.likedByMe)
+            binding.like.text = NiceNumberDisplay.shortNumber(post.likes)
+        }
+        binding.share.setOnClickListener {
+            if (id != null) {
+                val intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, post.content)
+                    type = "text/plain"
                 }
-            }
-            binding.delete.setOnClickListener {
-                if (id != null) {
-                    viewModel.removeById(id)
-                    findNavController().navigate(
-                        R.id.action_detailsFragmentPost_to_feedFragment)
-                }
-            }
 
-
-            binding.forward.setOnClickListener {
+                val shareIntent =
+                    Intent.createChooser(intent, getString(R.string.post_share))
+                startActivity(shareIntent)
+                viewModel.shareById(id)
+            }
+        }
+        binding.delete.setOnClickListener {
+            if (id != null) {
+                viewModel.removeById(id)
                 findNavController().navigate(
-                    R.id.action_detailsFragmentPost_to_feedFragment)
+                    R.id.action_detailsFragmentPost_to_feedFragment
+                )
             }
         }
-        //для обработки события системной кнопки «Назад»
-        val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
-            findNavController().navigate(
-                R.id.action_detailsFragmentPost_to_feedFragment)
 
+
+        binding.forward.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_detailsFragmentPost_to_feedFragment
+            )
         }
 
 
-        return binding.root
+    //для обработки события системной кнопки «Назад»
+    val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
+        findNavController().navigate(
+            R.id.action_detailsFragmentPost_to_feedFragment
+        )
+
     }
+
+
+    return binding.root
+}
 
 }
