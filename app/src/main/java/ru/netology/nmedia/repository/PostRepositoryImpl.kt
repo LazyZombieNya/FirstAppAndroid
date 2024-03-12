@@ -1,18 +1,26 @@
 package ru.netology.nmedia.repository
+
 import androidx.lifecycle.asLiveData
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
 import retrofit2.Response
 import ru.netology.nmedia.api.ApiService
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dao.PostRemoteKeyDao
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Media
@@ -26,20 +34,30 @@ import ru.netology.nmedia.error.UnknownError
 import ru.netology.nmedia.model.PhotoModel
 import java.io.File
 import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class  PostRepositoryImpl @Inject constructor(
+@Singleton
+class PostRepositoryImpl @Inject constructor(
     private val dao: PostDao,
     private val apiService: ApiService,
+    postRemoteKeyDao: PostRemoteKeyDao,
+    appDb: AppDb
 ) : PostRepository {
-    override val data = Pager(
+    @OptIn(ExperimentalPagingApi::class)
+    override val data: Flow<PagingData<Post>> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-        pagingSourceFactory = {
-            PostPagingSource(
-                apiService
-            )
-        }
+        pagingSourceFactory = { dao.getPagingSource() },
+        remoteMediator = PostRemoteMediator(
+            service = apiService,
+            postDao = dao,
+            postRemoteKeyDao = postRemoteKeyDao,
+            appDb = appDb
+        )
     ).flow
+        .map {
+            it.map(PostEntity::toDto)
+        }
 
     private var responseErrMess: Pair<Int, String> = Pair(0, "")
     override fun getErrMess(): Pair<Int, String> {
@@ -67,7 +85,7 @@ class  PostRepositoryImpl @Inject constructor(
     }
 
 
-    private suspend fun saveMedia(file: File):Response<Media>{
+    private suspend fun saveMedia(file: File): Response<Media> {
         val part = MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
         return apiService.saveMedia(part)
     }
@@ -90,6 +108,7 @@ class  PostRepositoryImpl @Inject constructor(
             throw UnknownError
         }
     }
+
     override suspend fun getAll() {
         try {
             saveOnServerCheck() //проверка текущий локальной БД на незаписанные посты на сервер, если такие есть то они пытаются отправится на сервер через save()
@@ -103,8 +122,7 @@ class  PostRepositoryImpl @Inject constructor(
 
             dao.insert(entityList)// А вот здесь в Локальную БД вставляем из сети все посты
             //А тут всем постам пришедшим с сервера ставим отметку тру
-            for (postEntity: PostEntity in entityList)
-            {
+            for (postEntity: PostEntity in entityList) {
                 if (!postEntity.savedOnServer) {
                     dao.saveOnServerSwitch(postEntity.id)
                 }
@@ -133,7 +151,7 @@ class  PostRepositoryImpl @Inject constructor(
 //        }
     }
 
-//    override fun shareByIdAsync(
+    //    override fun shareByIdAsync(
 //        id: Long,
 //        callback: PostRepository.RepositoryCallback<Post>
 //    ) {
@@ -151,23 +169,29 @@ class  PostRepositoryImpl @Inject constructor(
 //            }
 //        })
 //    }
-override fun getNewerCount(id: Long): Flow<Int> =flow {
-    while (true) {
-        delay(10_000L)
-        val response = apiService.getNewer(id)
-        if (!response.isSuccessful) {
-            responseErrMess = Pair(response.code(), response.message())
-            throw ApiError(response.code(), response.message())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getNewerCount(id: Long): Flow<Int> = flow {
+        while (true) {
+            delay(10_000L)
+            val response = apiService.getNewer(id)
+            if (!response.isSuccessful) {
+                responseErrMess = Pair(response.code(), response.message())
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            dao.insert(
+                body.toEntity().map {
+                    it.copy(
+                        savedOnServer = true,
+                        hidden = true
+                    )
+                })//вставляем в базу, скопированный ответ с сервера с нужными нам маркерами, записан на сервере и не показывать.
+            emit(body.size)
         }
-        val body = response.body() ?: throw ApiError(response.code(), response.message())
-        dao.insert(body.toEntity().map { it.copy(savedOnServer = true, hidden = true) })//вставляем в базу, скопированный ответ с сервера с нужными нам маркерами, записан на сервере и не показывать.
-        emit(body.size)
     }
-}
-.catch { throw UnknownError } //Репозиторий может выбрасывать исключения, но их тогда нужно обрабатывать во вьюмодели, тоже в кэтче флоу
+        .catch { throw UnknownError } //Репозиторий может выбрасывать исключения, но их тогда нужно обрабатывать во вьюмодели, тоже в кэтче флоу
 //        .flowOn(Dispatchers.Default)
-
-
 
 
 //    while (true) {
@@ -191,7 +215,7 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
         try {
             for (postEntentety: PostEntity in dao.getAll()
                 .asLiveData(Dispatchers.Default)
-                .value?: emptyList()) {
+                .value ?: emptyList()) {
                 if (!postEntentety.savedOnServer) {
                     save(postEntentety.toDto())
                 }
@@ -204,6 +228,7 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
             throw UnknownError
         }
     }
+
     override suspend fun saveWithAttachment(post: Post, photoModel: PhotoModel) {
         try {
 
@@ -247,11 +272,13 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
         getAll()
 
     }
+
     override suspend fun save(post: Post) {
         try {
             val postEntentety = PostEntity.fromDto(post)
             dao.insert(postEntentety) //при сохранении поста, в базу вносится интентети с отметкой что оно не сохарнено на сервере
-            val response = apiService.save(post.copy(id = 0)) //Если у поста айди 0 то сервер воспринимает его как новый
+            val response =
+                apiService.save(post.copy(id = 0)) //Если у поста айди 0 то сервер воспринимает его как новый
             if (!response.isSuccessful) { //если отвтет с сервера не пришел, то отметка о не записи на сервер по прежнему фолс
                 responseErrMess = Pair(response.code(), response.message())
                 throw ApiError(response.code(), response.message())
@@ -315,7 +342,7 @@ override fun getNewerCount(id: Long): Flow<Int> =flow {
 //        }
     }
 
-    override suspend  fun removeById(id: Long) {
+    override suspend fun removeById(id: Long) {
         try {
             dao.removeById(id)
             val response = apiService.removeById(id)

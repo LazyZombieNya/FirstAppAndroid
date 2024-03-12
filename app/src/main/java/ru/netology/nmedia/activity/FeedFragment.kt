@@ -20,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
@@ -189,42 +190,52 @@ class FeedFragment : Fragment() {
                 }
             }
         })
-
-//        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-//            binding.readNewPosts.isVisible = state>0
-//            println(state)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.newerCount.observe(viewLifecycleOwner) { state ->
+                binding.readNewPosts.isVisible = state > 0
+                println(state)
+            }
+        }
+//        viewLifecycleOwner.lifecycleScope.launch { //проверка показа плашки "новые записи"
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.newerCount.collect {
+//                    binding.readNewPosts.isVisible =
+//                        it > 0
+//                    println("$it posts add")
+//                }
+//            }
 //        }
 
-        binding.readNewPosts.setOnClickListener {
-            viewModel.readAll()
-        }
-
-        lifecycleScope.launchWhenCreated {
-            adapter.loadStateFlow.collectLatest {
-                binding.swiperefresh.isRefreshing = it.refresh is LoadState.Loading
-                        || it.append is LoadState.Loading
-                        || it.prepend is LoadState.Loading
+            binding.readNewPosts.setOnClickListener {
+                viewModel.readAll()
             }
 
-        }
-        binding.swiperefresh.setOnRefreshListener {
-            adapter.refresh()
-            //binding.swiperefresh.isRefreshing = false
-            //viewModel.loadPosts()
-            //context?.toast("Update" )
-        }
+            lifecycleScope.launchWhenCreated {
+                adapter.loadStateFlow.collectLatest {
+                    binding.swiperefresh.isRefreshing = it.refresh is LoadState.Loading
+                            || it.append is LoadState.Loading
+                            || it.prepend is LoadState.Loading
+                }
+
+            }
+            binding.swiperefresh.setOnRefreshListener {
+                adapter.refresh()
+                binding.swiperefresh.isRefreshing = false
+                viewModel.loadPosts()
+                //context?.toast("Update" )
+            }
 
 
-        binding.retryButton.setOnClickListener {
-            viewModel.loadPosts()
+            binding.retryButton.setOnClickListener {
+                viewModel.loadPosts()
+            }
+            binding.FAB.setOnClickListener {
+                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            }
+            return binding.root
         }
-        binding.FAB.setOnClickListener {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
-        }
-        return binding.root
+
     }
-
-}
 
 
 

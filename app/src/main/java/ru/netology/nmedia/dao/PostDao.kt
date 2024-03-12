@@ -1,5 +1,6 @@
 package ru.netology.nmedia.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -11,6 +12,9 @@ import ru.netology.nmedia.entity.PostEntity
 interface PostDao {
     @Query("SELECT * from PostEntity WHERE hidden = 0 ORDER BY id DESC")
     fun getAll(): Flow<List<PostEntity>>
+
+    @Query("SELECT * from PostEntity WHERE hidden = 0 ORDER BY id DESC")
+    fun getPagingSource(): PagingSource<Int,PostEntity>
 
     @Query("SELECT COUNT(*) == 0 FROM PostEntity")
     suspend fun isEmpty(): Boolean
@@ -27,7 +31,8 @@ interface PostDao {
     @Query("SELECT COUNT(*)  FROM PostEntity WHERE hidden=1")
     suspend fun getUnreadPosts(): Int
 
-
+    @Query("DELETE FROM PostEntity")
+    suspend fun clear()
 
 //    @Query("UPDATE PostEntity SET content = :text WHERE id = :id")
 //    fun changeContentById(id :Long,text:String)
