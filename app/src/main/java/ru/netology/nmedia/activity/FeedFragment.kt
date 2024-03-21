@@ -11,8 +11,10 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
@@ -166,11 +168,6 @@ class FeedFragment : Fragment() {
                     .show()
             }
         }
-        lifecycleScope.launchWhenCreated {
-            viewModel.data.collectLatest {
-                adapter.submitData(it)
-            }
-        }
 //        viewModel.data.observe(viewLifecycleOwner) { state ->
 //            val newPost = state.posts.size > adapter.currentList.size && adapter.itemCount>0
 //            adapter.submitList(state.posts){
@@ -190,10 +187,18 @@ class FeedFragment : Fragment() {
                 }
             }
         })
+
+        binding.list.adapter = adapter
+
+
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-                binding.readNewPosts.isVisible = state > 0
-                println(state)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.newerCount.collect{
+                    println("newer count:$it")
+                }
+                viewModel.data.collectLatest(adapter::submitData)
+                //binding.readNewPosts.isVisible = state > 0
+                //println(state)
             }
         }
 //        viewLifecycleOwner.lifecycleScope.launch { //проверка показа плашки "новые записи"
@@ -210,14 +215,16 @@ class FeedFragment : Fragment() {
                 viewModel.readAll()
             }
 
-            lifecycleScope.launchWhenCreated {
-                adapter.loadStateFlow.collectLatest {
-                    binding.swiperefresh.isRefreshing = it.refresh is LoadState.Loading
-                            || it.append is LoadState.Loading
-                            || it.prepend is LoadState.Loading
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.loadStateFlow.collectLatest { state ->
+                    binding.swiperefresh.isRefreshing =
+                        state.refresh is LoadState.Loading ||
+                                state.prepend is LoadState.Loading ||
+                                state.append is LoadState.Loading
                 }
-
             }
+        }
             binding.swiperefresh.setOnRefreshListener {
                 adapter.refresh()
                 binding.swiperefresh.isRefreshing = false

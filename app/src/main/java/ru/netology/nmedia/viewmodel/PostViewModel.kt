@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Post
@@ -59,12 +58,7 @@ class PostViewModel @Inject constructor(
     val dataState: LiveData<FeedModelState>
         get() = _dataState
 
-    val newerCount: LiveData<Int> = data.switchMap {
-        repository.getNewerCount( it.it.posts.firstOrNull()?.id ?: 0L)
-            .catch { _dataState.postValue(FeedModelState(error=true)) }
-            .asLiveData(Dispatchers.Default,100)
-    }
-
+    val newerCount = repository.getNewerCount()
 
     private val _photo = MutableLiveData<PhotoModel?>(null)
     val photo:LiveData<PhotoModel?>
@@ -74,9 +68,6 @@ class PostViewModel @Inject constructor(
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
-    init {
-        loadPosts()
-    }
 
     val toast : LiveData<String>
         get() = toastLiveData

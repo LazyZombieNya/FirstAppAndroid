@@ -7,11 +7,13 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -29,6 +31,7 @@ import ru.netology.nmedia.dto.Token
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.ApiError
+import ru.netology.nmedia.error.AppError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 import ru.netology.nmedia.model.PhotoModel
@@ -170,28 +173,24 @@ class PostRepositoryImpl @Inject constructor(
 //        })
 //    }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getNewerCount(id: Long): Flow<Int> = flow {
-        while (true) {
-            delay(10_000L)
-            val response = apiService.getNewer(id)
-            if (!response.isSuccessful) {
-                responseErrMess = Pair(response.code(), response.message())
-                throw ApiError(response.code(), response.message())
+    override fun getNewerCount(): Flow<Long> = dao.max()
+        .flatMapLatest {
+            if (it != null) {
+                flow {
+                    while (true) {
+                        delay(10_000L)
+                        val response = apiService.getNewer(it)
+
+                        val body = response.body()
+                        emit(body?.count ?: 0)
+                    }
+                }
+            } else {
+                emptyFlow()
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(
-                body.toEntity().map {
-                    it.copy(
-                        savedOnServer = true,
-                        hidden = true
-                    )
-                })//вставляем в базу, скопированный ответ с сервера с нужными нам маркерами, записан на сервере и не показывать.
-            emit(body.size)
         }
-    }
-        .catch { throw UnknownError } //Репозиторий может выбрасывать исключения, но их тогда нужно обрабатывать во вьюмодели, тоже в кэтче флоу
-//        .flowOn(Dispatchers.Default)
+        .catch { e -> throw AppError.from(e) }
+        .flowOn(Dispatchers.Default)
 
 
 //    while (true) {
@@ -221,10 +220,12 @@ class PostRepositoryImpl @Inject constructor(
                 }
             }
         } catch (e: IOException) {
-            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            responseErrMess =
+                Pair(NetworkError.code.toInt(), NetworkError.message.toString())
             throw NetworkError
         } catch (e: Exception) {
-            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            responseErrMess =
+                Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
     }
@@ -259,14 +260,17 @@ class PostRepositoryImpl @Inject constructor(
                 responseErrMess = Pair(response.code(), response.message())
                 throw ApiError(response.code(), response.message())
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            val body =
+                response.body() ?: throw ApiError(response.code(), response.message())
             dao.saveOnServerSwitch(body.id)
 
         } catch (e: IOException) {
-            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            responseErrMess =
+                Pair(NetworkError.code.toInt(), NetworkError.message.toString())
             throw NetworkError
         } catch (e: Exception) {
-            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            responseErrMess =
+                Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
         getAll()
@@ -283,14 +287,17 @@ class PostRepositoryImpl @Inject constructor(
                 responseErrMess = Pair(response.code(), response.message())
                 throw ApiError(response.code(), response.message())
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            val body =
+                response.body() ?: throw ApiError(response.code(), response.message())
             dao.saveOnServerSwitch(body.id)// исключение не брошено меняем отметку о записи на сервере на тру
 
         } catch (e: IOException) {
-            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            responseErrMess =
+                Pair(NetworkError.code.toInt(), NetworkError.message.toString())
             throw NetworkError
         } catch (e: Exception) {
-            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            responseErrMess =
+                Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
         getAll()
@@ -320,11 +327,13 @@ class PostRepositoryImpl @Inject constructor(
             }
             response.body() ?: throw ApiError(response.code(), response.message())
         } catch (e: IOException) {
-            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            responseErrMess =
+                Pair(NetworkError.code.toInt(), NetworkError.message.toString())
             throw NetworkError
 
         } catch (e: Exception) {
-            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            responseErrMess =
+                Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
 //        try {
@@ -351,11 +360,13 @@ class PostRepositoryImpl @Inject constructor(
             }
             response.body() ?: throw ApiError(response.code(), response.message())
         } catch (e: IOException) {
-            responseErrMess = Pair(NetworkError.code.toInt(), NetworkError.message.toString())
+            responseErrMess =
+                Pair(NetworkError.code.toInt(), NetworkError.message.toString())
             throw NetworkError
 
         } catch (e: Exception) {
-            responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
+            responseErrMess =
+                Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
 
