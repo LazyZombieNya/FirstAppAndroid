@@ -16,8 +16,8 @@ interface ApiService {
     @GET("posts/latest")
     suspend fun getLatest(@Query("count")count:Int): Response<List<Post>>
 
-    @GET("posts/{id}/newer")
-    fun getNewer(@Path("id") id: Long): Response<NewerCount>
+    @GET("posts/{id}/newer-count")
+    suspend fun getNewer(@Path("id") id: Long): Response<NewerCount>
 
 
     @GET("posts/{id}/before")

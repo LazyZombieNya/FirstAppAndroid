@@ -16,7 +16,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -190,17 +189,28 @@ class FeedFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.data.collectLatest(adapter::submitData)
+            }
+        }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.newerCount.collect{
                     println("newer count:$it")
                 }
-                viewModel.data.collectLatest(adapter::submitData)
-                //binding.readNewPosts.isVisible = state > 0
-                //println(state)
             }
         }
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.newerCount.collect {
+//                    println("newer count:$it")
+//                }
+//                viewModel.data.collectLatest(adapter::submitData)
+//                //binding.readNewPosts.isVisible = state > 0
+//                //println(state)
+//            }
+//        }
 //        viewLifecycleOwner.lifecycleScope.launch { //проверка показа плашки "новые записи"
 //            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 //                viewModel.newerCount.collect {
@@ -211,38 +221,40 @@ class FeedFragment : Fragment() {
 //            }
 //        }
 
-            binding.readNewPosts.setOnClickListener {
-                viewModel.readAll()
-            }
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                adapter.loadStateFlow.collectLatest { state ->
+//                    binding.swiperefresh.isRefreshing =
+//                        state.refresh is LoadState.Loading ||
+//                                state.prepend is LoadState.Loading ||
+//                                state.append is LoadState.Loading
+//                }
+//            }
+//        }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                adapter.loadStateFlow.collectLatest { state ->
-                    binding.swiperefresh.isRefreshing =
-                        state.refresh is LoadState.Loading ||
-                                state.prepend is LoadState.Loading ||
-                                state.append is LoadState.Loading
-                }
-            }
-        }
-            binding.swiperefresh.setOnRefreshListener {
-                adapter.refresh()
-                binding.swiperefresh.isRefreshing = false
-                viewModel.loadPosts()
-                //context?.toast("Update" )
-            }
-
-
-            binding.retryButton.setOnClickListener {
-                viewModel.loadPosts()
-            }
-            binding.FAB.setOnClickListener {
-                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
-            }
-            return binding.root
+        binding.readNewPosts.setOnClickListener {
+            viewModel.readAll()
         }
 
+
+        binding.swiperefresh.setOnRefreshListener {
+            adapter.refresh()
+            binding.swiperefresh.isRefreshing = false
+            viewModel.loadPosts()
+            //context?.toast("Update" )
+        }
+
+
+        binding.retryButton.setOnClickListener {
+            viewModel.loadPosts()
+        }
+        binding.FAB.setOnClickListener {
+            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+        }
+        return binding.root
     }
+
+}
 
 
 

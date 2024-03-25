@@ -63,4 +63,5 @@ interface PostDao {
     @Query("SELECT MAX(id) FROM PostEntity")
     fun max():Flow<Long?>
 
+
 }
