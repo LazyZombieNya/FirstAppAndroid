@@ -201,6 +201,15 @@ class FeedFragment : Fragment() {
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch { //проверка показа плашки "новые записи"
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.newerCount.collect {
+                    binding.readNewPosts.isVisible =
+                        it > 0
+                    println("$it posts add")
+                }
+            }
+        }
 //        viewLifecycleOwner.lifecycleScope.launch {
 //            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 //                viewModel.newerCount.collect {
@@ -233,7 +242,7 @@ class FeedFragment : Fragment() {
 //        }
 
         binding.readNewPosts.setOnClickListener {
-            viewModel.readAll()
+            adapter.refresh()
         }
 
 

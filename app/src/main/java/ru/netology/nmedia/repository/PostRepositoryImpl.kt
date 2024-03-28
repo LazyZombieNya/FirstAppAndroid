@@ -139,6 +139,7 @@ class PostRepositoryImpl @Inject constructor(
             responseErrMess = Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
+    }
 //        try {
 //            val response = PostsApi.service.getAll()
 //            if (!response.isSuccessful) {
@@ -152,7 +153,7 @@ class PostRepositoryImpl @Inject constructor(
 //        } catch (e: Exception) {
 //            throw UnknownError
 //        }
-    }
+//    }
 
     //    override fun shareByIdAsync(
 //        id: Long,
@@ -300,7 +301,7 @@ class PostRepositoryImpl @Inject constructor(
                 Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
-        getAll()
+//        getAll()
     }
 //        try {
 //            val response = PostsApi.service.save(post)
