@@ -11,15 +11,17 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
@@ -165,11 +167,6 @@ class FeedFragment : Fragment() {
                     .show()
             }
         }
-        lifecycleScope.launchWhenCreated {
-            viewModel.data.collectLatest {
-                adapter.submitData(it)
-            }
-        }
 //        viewModel.data.observe(viewLifecycleOwner) { state ->
 //            val newPost = state.posts.size > adapter.currentList.size && adapter.itemCount>0
 //            adapter.submitList(state.posts){
@@ -190,27 +187,69 @@ class FeedFragment : Fragment() {
             }
         })
 
-//        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-//            binding.readNewPosts.isVisible = state>0
-//            println(state)
+        binding.list.adapter = adapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.data.collectLatest(adapter::submitData)
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.newerCount.collect{
+                    println("newer count:$it")
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch { //проверка показа плашки "новые записи"
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.newerCount.collect {
+                    binding.readNewPosts.isVisible =
+                        it > 0
+                    println("$it posts add")
+                }
+            }
+        }
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.newerCount.collect {
+//                    println("newer count:$it")
+//                }
+//                viewModel.data.collectLatest(adapter::submitData)
+//                //binding.readNewPosts.isVisible = state > 0
+//                //println(state)
+//            }
+//        }
+//        viewLifecycleOwner.lifecycleScope.launch { //проверка показа плашки "новые записи"
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.newerCount.collect {
+//                    binding.readNewPosts.isVisible =
+//                        it > 0
+//                    println("$it posts add")
+//                }
+//            }
+//        }
+
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                adapter.loadStateFlow.collectLatest { state ->
+//                    binding.swiperefresh.isRefreshing =
+//                        state.refresh is LoadState.Loading ||
+//                                state.prepend is LoadState.Loading ||
+//                                state.append is LoadState.Loading
+//                }
+//            }
 //        }
 
         binding.readNewPosts.setOnClickListener {
-            viewModel.readAll()
+            adapter.refresh()
         }
 
-        lifecycleScope.launchWhenCreated {
-            adapter.loadStateFlow.collectLatest {
-                binding.swiperefresh.isRefreshing = it.refresh is LoadState.Loading
-                        || it.append is LoadState.Loading
-                        || it.prepend is LoadState.Loading
-            }
 
-        }
         binding.swiperefresh.setOnRefreshListener {
             adapter.refresh()
-            //binding.swiperefresh.isRefreshing = false
-            //viewModel.loadPosts()
+            binding.swiperefresh.isRefreshing = false
+            viewModel.loadPosts()
             //context?.toast("Update" )
         }
 
