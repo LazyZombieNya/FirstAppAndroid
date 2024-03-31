@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -27,6 +28,7 @@ import ru.netology.nmedia.activity.DetailsFragmentPost.Companion.id
 import ru.netology.nmedia.activity.NewPostFragment.Companion.text
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostAdapter
+import ru.netology.nmedia.adapter.PostLoadingStateAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
@@ -187,18 +189,14 @@ class FeedFragment : Fragment() {
             }
         })
 
-        binding.list.adapter = adapter
+        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = PostLoadingStateAdapter{ adapter.retry()},
+            footer = PostLoadingStateAdapter{ adapter.retry()},
+        )
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.data.collectLatest(adapter::submitData)
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.newerCount.collect{
-                    println("newer count:$it")
-                }
             }
         }
         viewLifecycleOwner.lifecycleScope.launch { //проверка показа плашки "новые записи"
@@ -206,40 +204,21 @@ class FeedFragment : Fragment() {
                 viewModel.newerCount.collect {
                     binding.readNewPosts.isVisible =
                         it > 0
-                    println("$it posts add")
+                    println("newer count:$it")
                 }
             }
         }
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.newerCount.collect {
-//                    println("newer count:$it")
-//                }
-//                viewModel.data.collectLatest(adapter::submitData)
-//                //binding.readNewPosts.isVisible = state > 0
-//                //println(state)
-//            }
-//        }
-//        viewLifecycleOwner.lifecycleScope.launch { //проверка показа плашки "новые записи"
-//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.newerCount.collect {
-//                    binding.readNewPosts.isVisible =
-//                        it > 0
-//                    println("$it posts add")
-//                }
-//            }
-//        }
 
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                adapter.loadStateFlow.collectLatest { state ->
-//                    binding.swiperefresh.isRefreshing =
-//                        state.refresh is LoadState.Loading ||
-//                                state.prepend is LoadState.Loading ||
-//                                state.append is LoadState.Loading
-//                }
-//            }
-//        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.loadStateFlow.collectLatest { state ->
+                    binding.swiperefresh.isRefreshing =
+                        state.refresh is LoadState.Loading ||
+                                state.prepend is LoadState.Loading ||
+                                state.append is LoadState.Loading
+                }
+            }
+        }
 
         binding.readNewPosts.setOnClickListener {
             adapter.refresh()

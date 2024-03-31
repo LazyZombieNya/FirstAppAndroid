@@ -12,11 +12,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.R
+import ru.netology.nmedia.databinding.CardAdBinding
 import ru.netology.nmedia.databinding.CardPostBinding
+import ru.netology.nmedia.dto.Ad
+import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.NiceNumberDisplay
+import ru.netology.nmedia.view.load
 
-interface OnInteractionListener{
+interface OnInteractionListener {
     fun like(post: Post)
     fun remove(post: Post)
     fun edit(post: Post)
@@ -29,24 +33,57 @@ interface OnInteractionListener{
 
 class PostAdapter(
     private val onInteractionListener: OnInteractionListener,
-): PagingDataAdapter<Post, PostViewHolder>(PostDiffCallback()){
+) : PagingDataAdapter<FeedItem, RecyclerView.ViewHolder>(PostDiffCallback()) {
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position)) {
+            is Ad -> R.layout.card_ad
+            is Post -> R.layout.card_post
+            null -> error("unknown item type")
+        }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val binding = CardPostBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-        return PostViewHolder(binding,onInteractionListener)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        when (viewType) {
+            R.layout.card_post -> {
+                val binding =
+                    CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                PostViewHolder(binding, onInteractionListener)
+            }
+
+            R.layout.card_ad -> {
+                val binding =
+                    CardAdBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                AdViewHolder(binding)
+            }
+
+            else -> error("unknown item type")
+
+        }
+
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when(val item = getItem(position)){
+            is Ad -> (holder as? AdViewHolder)?.bind(item)
+            is Post -> (holder as? PostViewHolder)?.bind(item)
+            null -> error("unknown item type")
+        }
+
     }
-
-    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = getItem(position)?:return
-        holder.bind(post)
-    }
-
 }
+
+class AdViewHolder(
+    private val binding: CardAdBinding,
+) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(ad: Ad) {
+        binding.image.load("${BuildConfig.BASE_URL}/media/${ad.image}")
+    }
+}
+
 class PostViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener,
-):RecyclerView.ViewHolder(binding.root){
-    fun bind(post: Post){
+) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(post: Post) {
         binding.apply {
             val avatarName = post.authorAvatar
             val url = "${BuildConfig.BASE_URL}/avatars/${avatarName}"
@@ -68,7 +105,7 @@ class PostViewHolder(
             } else {
                 videoContent.visibility = View.GONE
             }
-            if (post.attachment!=null){
+            if (post.attachment != null) {
                 binding.attachmentImage.visibility = View.VISIBLE
                 val attachmentUrl = post.attachment.url
                 val url = "http://10.0.2.2:9999/media/${attachmentUrl}"
@@ -89,7 +126,7 @@ class PostViewHolder(
             videoContent?.setOnClickListener {
                 onInteractionListener.video(post)
             }
-            attachmentImage?.setOnClickListener{
+            attachmentImage?.setOnClickListener {
                 onInteractionListener.image(post)
             }
             //чтобы ссылки не мешали когда кликаешь на editContent
@@ -111,18 +148,20 @@ class PostViewHolder(
 
             menu.isVisible = post.ownedByMe
             menu.setOnClickListener {
-                PopupMenu(it.context,it).apply {
+                PopupMenu(it.context, it).apply {
                     inflate(R.menu.menu_options)
                     setOnMenuItemClickListener { item ->
-                        when(item.itemId){
+                        when (item.itemId) {
                             R.id.remove -> {
                                 onInteractionListener.remove(post)
                                 true
                             }
+
                             R.id.edit -> {
                                 onInteractionListener.edit(post)
                                 true
                             }
+
                             else -> false
                         }
                     }
@@ -132,12 +171,17 @@ class PostViewHolder(
     }
 
 }
-class PostDiffCallback : DiffUtil.ItemCallback<Post>(){
-    override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+
+class PostDiffCallback : DiffUtil.ItemCallback<FeedItem>() {
+    override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        if (oldItem::class != newItem::class) {
+            return false
+        }
+
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
-        return oldItem==newItem
+    override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        return oldItem == newItem
     }
 }
