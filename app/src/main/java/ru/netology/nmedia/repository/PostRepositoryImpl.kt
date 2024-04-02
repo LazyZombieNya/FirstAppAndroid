@@ -284,7 +284,7 @@ class PostRepositoryImpl @Inject constructor(
                 Pair(UnknownError.code.toInt(), UnknownError.message.toString())
             throw UnknownError
         }
-        getAll()
+        //getAll()
 
     }
 
