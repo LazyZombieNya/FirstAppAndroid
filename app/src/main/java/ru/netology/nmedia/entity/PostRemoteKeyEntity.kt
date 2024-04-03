@@ -3,10 +3,10 @@ package ru.netology.nmedia.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 @Entity
-data class PostRemoteKeyEntity (
+data class PostRemoteKeyEntity(
     @PrimaryKey
     val type:KeyType,
-    val key:Long,
+    val key: Long?,
 ){
     enum class KeyType{
     AFTER,
