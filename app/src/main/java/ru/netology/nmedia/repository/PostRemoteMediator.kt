@@ -31,6 +31,7 @@ class PostRemoteMediator(
         try {
             val result = when (loadType) {
                 LoadType.APPEND -> {
+                    delay(2500)
                     val id = postRemoteKeyDao.min() ?: return MediatorResult.Success(false)
                     service.getBefore(id, state.config.pageSize)
                 }
@@ -98,7 +99,7 @@ class PostRemoteMediator(
                         postRemoteKeyDao.insert(
                             PostRemoteKeyEntity(
                                 PostRemoteKeyEntity.KeyType.BEFORE,
-                                body.last().id,
+                                body.lastOrNull()?.id, //Если нет постов больше старых
                             ),
 
                             )
